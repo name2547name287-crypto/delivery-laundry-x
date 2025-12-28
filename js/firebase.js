@@ -1,4 +1,3 @@
-<script>
   const firebaseConfig = {
   apiKey: "AIzaSyCNTbxBMf5gL-KqdXznqIT5Mtwu9NLckxY",
   authDomain: "delivery-laundry-x-dcd9f.firebaseapp.com",
@@ -14,4 +13,3 @@
   const db = firebase.firestore();
 
   console.log("🔥 Firebase initialized");
-</script>
