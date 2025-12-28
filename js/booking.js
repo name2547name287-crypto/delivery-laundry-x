@@ -1,64 +1,53 @@
-if (!currentDistance || currentDistance === 0) {
-  priceEl.innerText = "📍 กรุณาเลือกจุดรับผ้าบนแผนที่";
-  return;
-}
-
 alert("booking.js loaded");
 
-// ===== DEBUG PANEL =====
-const debugBox = document.createElement("div");
-debugBox.style.background = "#000";
-debugBox.style.color = "#0f0";
-debugBox.style.padding = "10px";
-debugBox.style.fontSize = "12px";
-debugBox.style.whiteSpace = "pre-wrap";
-debugBox.innerText = "🛠 DEBUG LOG\n";
-document.body.appendChild(debugBox);
+// ===== GLOBAL =====
+let map, marker, circle;
+let isInServiceArea = false;
+let currentDistance = 0;
 
-function log(msg) {
-  debugBox.innerText += msg + "\n";
-}
-
-log("booking.js loaded");
+// ===== CONFIG =====
+const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
+const SERVICE_RADIUS = 1000;
 
 // ===== PRICE =====
 function updatePrice() {
-  const weightEl = document.getElementById("weight");
-  const distanceEl = document.getElementById("distance");
-  const timeSlotEl = document.getElementById("timeSlot");
+  const weight = Number(document.getElementById("weight")?.value) || 10;
+  const timeSlot = document.getElementById("timeSlot")?.value;
   const priceEl = document.getElementById("price");
 
-  if (!weightEl || !distanceEl || !timeSlotEl || !priceEl) return;
+  if (!priceEl) return;
 
-  const weight = Number(weightEl.value) || 10;
-  const distance = Number(distanceEl.value) || 0;
-  const timeSlot = timeSlotEl.value;
+  if (!currentDistance || currentDistance === 0) {
+    priceEl.innerText = "📍 กรุณาเลือกจุดรับผ้าบนแผนที่";
+    return;
+  }
+
+  if (!isInServiceArea) {
+    priceEl.innerText = "❌ อยู่นอกพื้นที่ให้บริการ";
+    return;
+  }
 
   let price = weight * 2;
 
-  if (distance <= 500) price += 20;
-  else if (distance <= 1000) price += 30;
+  if (currentDistance <= 500) price += 20;
+  else if (currentDistance <= 1000) price += 30;
+  else {
+    priceEl.innerText = "❌ เกินระยะให้บริการ";
+    return;
+  }
 
-  if (timeSlot >= "21:30") price += 10;
+  if (timeSlot && timeSlot >= "21:30") {
+    price += 10;
+  }
 
   priceEl.innerText = `💰 ราคาประมาณ: ${price} บาท`;
 }
 
-document.addEventListener("DOMContentLoaded", updatePrice);
-
-// ===== MAP CONFIG =====
-let map, marker, circle;
-let isInServiceArea = false;
-
-const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
-const SERVICE_RADIUS = 1000;
-
+// ===== MAP =====
 window.initMap = function () {
-  log("✅ initMap called");
-
   const mapEl = document.getElementById("map");
   if (!mapEl) {
-    log("❌ map element NOT FOUND");
+    alert("❌ map element not found");
     return;
   }
 
@@ -82,34 +71,32 @@ window.initMap = function () {
     draggable: true,
   });
 
-  checkArea();
+  map.addListener("click", (e) => {
+    marker.setPosition(e.latLng);
+    checkArea();
+  });
+
   marker.addListener("dragend", checkArea);
 
-
-  log("🗺 map rendered");
-
- map.addListener("click", (e) => {
-  marker.setPosition(e.latLng);
   checkArea();
- });
-
- #map * {
-  touch-action: manipulation;
-}
-
 };
 
-
 function checkArea() {
-  const distance =
+  currentDistance =
     google.maps.geometry.spherical.computeDistanceBetween(
       marker.getPosition(),
       circle.getCenter()
     );
 
   const statusEl = document.getElementById("areaStatus");
+  const distanceText = document.getElementById("distanceText");
 
-  if (distance <= SERVICE_RADIUS) {
+  if (distanceText) {
+    distanceText.innerText =
+      "📍 ระยะทาง: " + Math.round(currentDistance) + " เมตร";
+  }
+
+  if (currentDistance <= SERVICE_RADIUS) {
     isInServiceArea = true;
     statusEl.innerText = "✅ อยู่ในพื้นที่ให้บริการ";
     statusEl.style.color = "green";
@@ -118,4 +105,6 @@ function checkArea() {
     statusEl.innerText = "❌ อยู่นอกพื้นที่ให้บริการ";
     statusEl.style.color = "red";
   }
+
+  updatePrice();
 }
