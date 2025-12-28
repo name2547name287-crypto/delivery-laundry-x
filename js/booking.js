@@ -1,3 +1,5 @@
+alert("booking.js loaded");
+
 // ===== DEBUG PANEL =====
 const debugBox = document.createElement("div");
 debugBox.style.background = "#000";
