@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Delivery Laundry X</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  </head>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f2f2f2;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.app {
+  max-width: 420px;
+  margin: auto;
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: #d32f2f;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+.app-content {
+  flex: 1;
+  padding: 20px;
+}
+
+label {
+  font-size: 14px;
+  margin-top: 10px;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.price-box {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f8f8;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 16px;
+  background: #d32f2f;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+}
+
+.primary-btn:active {
+  background: #b71c1c;
+}
+
+.app-footer {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  padding: 10px;
+}
+</style>
+
+<body>
+
+<div class="app">
+
+  <header class="app-header">
+    <h1>Delivery Laundry X</h1>
+    <p>บริการรับ–ส่งซักผ้า</p>
+  </header>
+
+  <main class="app-content">
+
+    <label>น้ำหนัก (kg)</label>
+    <input id="weight" type="number" value="10" min="10" oninput="updatePrice()">
+
+    <label>ระยะทาง (เมตร)</label>
+    <input id="distance" type="number" value="500" oninput="updatePrice()">
+
+    <label>รอบเวลา</label>
+    <select id="timeSlot" onchange="updatePrice()">
+      <option value="">เลือกรอบ</option>
+      <option value="09:00-10:30">09:00 - 10:30</option>
+      <option value="13:00-14:30">13:00 - 14:30</option>
+      <option value="19:30-21:00">19:30 - 21:00</option>
+      <option value="21:00-22:30">21:00 - 22:30</option>
+      <option value="22:30-00:00">22:30 - 00:00</option>
+      <option value="00:00-02:00">00:00 - 02:00</option>
+    </select>
+
+    <label>วันที่รับงาน</label>
+    <input id="bookingDate" type="date">
+
+    <div class="price-box">
+      <span>ราคาประมาณ</span>
+      <strong id="price">-</strong>
+    </div>
+
+    <button class="primary-btn" onclick="submitBooking()">
+      ยืนยันการจอง
+    </button>
+
+  </main>
+
+  <footer class="app-footer">
+    Delivery Laundry X ©
+  </footer>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Delivery Laundry X</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family:sans-serif; padding:20px; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { border:1px solid #ccc; padding:8px; text-align:center; }
+    th { background:#222; color:#fff; }
+  </style>
+</head>
+
+<body>
+
+<h2>📋 Admin Panel</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ลูกค้า</th>
+      <th>วันที่</th>
+      <th>รอบ</th>
+      <th>นน.(kg)</th>
+      <th>ระยะ</th>
+      <th>ราคา</th>
+      <th>สถานะ</th>
+      <th>ปรับ</th>
+    </tr>
+  </thead>
+  <tbody id="orders"></tbody>
+</table>
+
+<hr>
+
+<h3>⚙️ ตั้งค่าเรท</h3>
+<input id="rateKg" type="number" placeholder="บาท / kg">
+<input id="rateNight" type="number" placeholder="ค่ากลางคืน">
+<button onclick="saveRate()">บันทึกเรท</button>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+
+<script>
+const ordersEl = document.getElementById("orders");
+
+db.collection("orders").orderBy("createdAt","desc")
+.onSnapshot(snapshot=>{
+  ordersEl.innerHTML="";
+  snapshot.forEach(doc=>{
+    const o = doc.data();
+    ordersEl.innerHTML += `
+      <tr>
+        <td>${o.email || "-"}</td>
+        <td>${o.bookingDate}</td>
+        <td>${o.timeSlot}</td>
+        <td>${o.weight}</td>
+        <td>${o.distance}</td>
+        <td>${o.price}</td>
+        <td>${o.status}</td>
+        <td>
+          <select onchange="updateStatus('${doc.id}',this.value)">
+            <option ${o.status==="รอรับงาน"?"selected":""}>รอรับงาน</option>
+            <option ${o.status==="กำลังไปรับ"?"selected":""}>กำลังไปรับ</option>
+            <option ${o.status==="เสร็จสิ้น"?"selected":""}>เสร็จสิ้น</option>
+          </select>
+        </td>
+      </tr>`;
+  });
+});
+
+function updateStatus(id,status){
+  db.collection("orders").doc(id).update({status});
+}
+
+db.collection("settings").doc("rate").get().then(doc=>{
+  if(doc.exists){
+    rateKg.value = doc.data().kg;
+    rateNight.value = doc.data().night;
+  }
+});
+
+function saveRate(){
+  db.collection("settings").doc("rate").set({
+    kg:Number(rateKg.value),
+    night:Number(rateNight.value)
+  });
+  alert("บันทึกเรทแล้ว");
+}
+</script>
+
+</body>
+</html>
