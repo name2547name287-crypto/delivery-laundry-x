@@ -1,3 +1,8 @@
+if (!currentDistance || currentDistance === 0) {
+  priceEl.innerText = "📍 กรุณาเลือกจุดรับผ้าบนแผนที่";
+  return;
+}
+
 alert("booking.js loaded");
 
 // ===== DEBUG PANEL =====
@@ -45,7 +50,7 @@ document.addEventListener("DOMContentLoaded", updatePrice);
 let map, marker, circle;
 let isInServiceArea = false;
 
-const SHOP_CENTER = { lat: 16.426595, lng: 102.832262 };
+const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
 const SERVICE_RADIUS = 1000;
 
 window.initMap = function () {
@@ -81,7 +86,14 @@ window.initMap = function () {
   marker.addListener("dragend", checkArea);
 
   log("🗺 map rendered");
+
+  map.addListener("click", (e) => {
+  marker.setPosition(e.latLng);
+  checkArea();
+});
+
 };
+
 
 function checkArea() {
   const distance =
