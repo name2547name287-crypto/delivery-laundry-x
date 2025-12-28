@@ -57,13 +57,15 @@ window.initMap = function () {
   });
 
   circle = new google.maps.Circle({
-    map,
-    center: SHOP_CENTER,
-    radius: SERVICE_RADIUS,
-    fillColor: "#d32f2f",
-    fillOpacity: 0.25,
-    strokeColor: "#d32f2f",
+  map,
+  center: SHOP_CENTER,
+  radius: SERVICE_RADIUS,
+  fillColor: "#d32f2f",
+  fillOpacity: 0.25,
+  strokeColor: "#d32f2f",
+  clickable: false   // ⭐ สำคัญมาก
   });
+
 
   marker = new google.maps.Marker({
     map,
