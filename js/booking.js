@@ -76,9 +76,12 @@ window.initMap = function () {
     checkArea();
   });
 
+
   marker.addListener("dragend", checkArea);
 
   checkArea();
+  
+
 };
 
 function checkArea() {
@@ -107,4 +110,45 @@ function checkArea() {
   }
 
   updatePrice();
+}
+
+function useMyLocation() {
+  if (!navigator.geolocation) {
+    alert("อุปกรณ์ไม่รองรับ GPS");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const userLatLng = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+      };
+
+      marker.setPosition(userLatLng);
+      map.panTo(userLatLng);
+      checkArea();
+    },
+    () => {
+      alert("ไม่สามารถเข้าถึงตำแหน่งได้ กรุณาเปิด GPS");
+    },
+    { enableHighAccuracy: true }
+  );
+}
+
+function submitBooking() {
+  const name = document.getElementById("customerName").value.trim();
+  const phone = document.getElementById("customerPhone").value.trim();
+
+  if (!name || !phone) {
+    alert("กรุณากรอกชื่อและเบอร์โทร");
+    return;
+  }
+
+  if (!isInServiceArea) {
+    alert("อยู่นอกพื้นที่ให้บริการ");
+    return;
+  }
+
+  alert("✅ พร้อมบันทึกการจอง (ขั้นถัดไปคือ Firebase)");
 }

@@ -98,6 +98,10 @@ input, select {
 #map * {
   touch-action: manipulation;
 }
+#map {
+  touch-action: pan-x pan-y;
+}
+
 
 
 .info-box {
@@ -154,13 +158,25 @@ input, select {
     </div>
 
 <h3>📍 เลือกจุดรับผ้า</h3>
+
+<button type="button" onclick="useMyLocation()">
+📍 ใช้ตำแหน่งปัจจุบัน
+</button>
+
 <div id="map"></div>
 <div class="info-box">
   <p id="distanceText">📍 ระยะทาง: -</p>
   <p id="areaStatus">สถานะพื้นที่: -</p>
   <p id="price">💰 ราคาประมาณ: -</p>   
 
-<button class="primary-btn" onclick="submitBooking()">      ยืนยันการจอง
+<h3>📞 ข้อมูลติดต่อ</h3>
+
+<input id="customerName" placeholder="ชื่อผู้ติดต่อ" required>
+<input id="customerPhone" placeholder="เบอร์โทร" type="tel" required>
+<textarea id="customerNote" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)"></textarea>
+
+
+  <button class="primary-btn" onclick="submitBooking()">      ยืนยันการจอง
     </button>
 
   </main>
