@@ -1,10 +1,17 @@
-const firebaseConfig = {
-  apiKey: "PUT_YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
+<script>
+  const firebaseConfig = {
+  apiKey: "AIzaSyCNTbxBMf5gL-KqdXznqIT5Mtwu9NLckxY",
+  authDomain: "delivery-laundry-x-dcd9f.firebaseapp.com",
+  projectId: "delivery-laundry-x-dcd9f",
+  storageBucket: "delivery-laundry-x-dcd9f.firebasestorage.app",
+  messagingSenderId: "648273904876",
+  appId: "1:648273904876:web:422a1e6ca41c85269411c9"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+  firebase.initializeApp(firebaseConfig);
 
-console.log("🔥 Firebase initialized OK");
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  console.log("🔥 Firebase initialized");
+</script>

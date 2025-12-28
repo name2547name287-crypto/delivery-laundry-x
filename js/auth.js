@@ -1,36 +1,39 @@
 console.log("✅ auth.js loaded");
 
-function login(){
+async function register() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value;
 
-  firebase.auth().signInWithEmailAndPassword(email,password)
-    .then(()=>alert("Login สำเร็จ"))
-    .catch(err=>alert(err.message));
-}
+  if (!email || !password || !username) {
+    alert("กรอกข้อมูลให้ครบ");
+    return;
+  }
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+  try {
+    const res = await auth.createUserWithEmailAndPassword(email, password);
 
-async function register() {
-  const email = emailEl.value;
-  const pass = passwordEl.value;
-  const username = usernameEl.value;
+    await db.collection("users").doc(res.user.uid).set({
+      username: username,
+      role: "customer",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-  const res = await auth.createUserWithEmailAndPassword(email, pass);
-
-  await db.collection("users").doc(res.user.uid).set({
-    username,
-    role: "customer"
-  });
-
-  location.href = "index.html";
+    alert("สมัครสำเร็จ");
+    window.location.href = "index.html";
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 async function login() {
-  await auth.signInWithEmailAndPassword(
-    emailEl.value,
-    passwordEl.value
-  );
-  location.href = "index.html";
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    window.location.href = "index.html";
+  } catch (err) {
+    alert(err.message);
+  }
 }
