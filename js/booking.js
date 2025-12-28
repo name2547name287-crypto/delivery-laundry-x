@@ -85,12 +85,17 @@ window.initMap = function () {
   checkArea();
   marker.addListener("dragend", checkArea);
 
+
   log("🗺 map rendered");
 
-  map.addListener("click", (e) => {
+ map.addListener("click", (e) => {
   marker.setPosition(e.latLng);
   checkArea();
-});
+ });
+
+ #map * {
+  touch-action: manipulation;
+}
 
 };
 

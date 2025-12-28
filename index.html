@@ -88,9 +88,11 @@ input, select {
 
 #map {
   width: 100%;
-  height: 300px;   /* ถ้าไม่มีบรรทัดนี้ = ไม่ขึ้น */
+  height: 320px;        /* ⭐ บังคับเป็น px */
+  min-height: 320px;
   border-radius: 12px;
   margin-top: 10px;
+  touch-action: manipulation;
 }
 
 .info-box {
