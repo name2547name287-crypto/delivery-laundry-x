@@ -92,6 +92,16 @@ input, select {
   border-radius: 12px;
   margin-top: 10px;
 }
+
+.info-box {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 16px;
+}
+
 </style>
 <body>
 
@@ -107,19 +117,26 @@ input, select {
     <label>น้ำหนัก (kg)</label>
     <input id="weight" type="number" value="10" min="10" oninput="updatePrice()">
 
-    <label>ระยะทาง (เมตร)</label>
-    <input id="distance" type="number" value="500" oninput="updatePrice()">
 
-    <label>รอบเวลา</label>
-    <select id="timeSlot" onchange="updatePrice()">
-      <option value="">เลือกรอบ</option>
-      <option value="09:00-10:30">09:00 - 10:30</option>
-      <option value="13:00-14:30">13:00 - 14:30</option>
-      <option value="19:30-21:00">19:30 - 21:00</option>
-      <option value="21:00-22:30">21:00 - 22:30</option>
-      <option value="22:30-00:00">22:30 - 00:00</option>
-      <option value="00:00-02:00">00:00 - 02:00</option>
-    </select>
+    <label>เลือกรอบจอง</label>
+<select id="timeSlot" onchange="updatePrice()">
+  <option value="">-- เลือกรอบ --</option>
+
+  <optgroup label="☀️ กะเช้า">
+    <option value="08:00">08:00 – 10:00</option>
+    <option value="10:00">10:00 – 11:30</option>
+    <option value="12:30">12:30 – 13:30</option>
+    <option value="13:30">13:30 – 15:00</option>
+  </optgroup>
+
+  <optgroup label="🌙 กะดึก">
+    <option value="19:30">19:30 – 21:00</option>
+    <option value="21:00">21:00 – 22:30</option>
+    <option value="22:30">22:30 – 00:00</option>
+    <option value="00:00">00:00 – 02:00</option>
+  </optgroup>
+</select>
+
 
     <label>วันที่รับงาน</label>
     <input id="bookingDate" type="date">
@@ -131,8 +148,10 @@ input, select {
 
 <h3>📍 เลือกจุดรับผ้า</h3>
 <div id="map"></div>
-<p id="areaStatus"></p>
-<p id="distanceInfo"></p>    
+<div class="info-box">
+  <p id="distanceText">📍 ระยะทาง: -</p>
+  <p id="areaStatus">สถานะพื้นที่: -</p>
+  <p id="price">💰 ราคาประมาณ: -</p>   
 
 <button class="primary-btn" onclick="submitBooking()">      ยืนยันการจอง
     </button>

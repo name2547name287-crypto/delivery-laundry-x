@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", updatePrice);
 let map, marker, circle;
 let isInServiceArea = false;
 
-const SHOP_CENTER = { lat: 13.7563, lng: 100.5018 };
+const SHOP_CENTER = { lat: 16.426595, lng: 102.832262 };
 const SERVICE_RADIUS = 1000;
 
 window.initMap = function () {
