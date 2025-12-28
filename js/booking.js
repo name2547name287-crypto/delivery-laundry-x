@@ -1,5 +1,13 @@
 alert("booking.js loaded");
 
+const NIGHT_SLOTS = [
+  "21:00",
+  "22:30",
+  "00:00",
+  "02:00"
+];
+
+
 // ===== GLOBAL =====
 let map, marker, circle;
 let isInServiceArea = false;
@@ -36,9 +44,10 @@ function updatePrice() {
     return;
   }
 
-  if (timeSlot && timeSlot >= "21:30") {
-    price += 10;
+  if (NIGHT_SLOTS.includes(timeSlot)) {
+  price += 10;
   }
+
 
   priceEl.innerText = `💰 ราคาประมาณ: ${price} บาท`;
 }
