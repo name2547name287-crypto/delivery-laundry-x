@@ -1,3 +1,19 @@
+// ===== DEBUG PANEL =====
+const debugBox = document.createElement("div");
+debugBox.style.background = "#000";
+debugBox.style.color = "#0f0";
+debugBox.style.padding = "10px";
+debugBox.style.fontSize = "12px";
+debugBox.style.whiteSpace = "pre-wrap";
+debugBox.innerText = "🛠 DEBUG LOG\n";
+document.body.appendChild(debugBox);
+
+function log(msg) {
+  debugBox.innerText += msg + "\n";
+}
+
+log("booking.js loaded");
+
 if (!isInServiceArea) {
   alert("อยู่นอกพื้นที่ให้บริการ ไม่สามารถจองได้");
   return;
@@ -40,32 +56,26 @@ let isInServiceArea = false;
 const SHOP_CENTER = { lat: 13.7563, lng: 100.5018 }; 
 const SERVICE_RADIUS = 1000; // เมตร (1 กม.)
 
-function initMap() {
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: SHOP_CENTER,
+window.initMap = function () {
+  log("✅ initMap called");
+
+  const mapEl = document.getElementById("map");
+  if (!mapEl) {
+    log("❌ map element NOT FOUND");
+    return;
+  }
+
+  mapEl.style.background = "#ddd";
+  log("📦 map element found");
+
+  new google.maps.Map(mapEl, {
+    center: { lat: 13.7563, lng: 100.5018 },
     zoom: 15,
   });
 
-  circle = new google.maps.Circle({
-    map,
-    center: SHOP_CENTER,
-    radius: SERVICE_RADIUS,
-    fillColor: "#d32f2f",
-    fillOpacity: 0.25,
-    strokeColor: "#d32f2f",
-    strokeWeight: 2,
-  });
+  log("🗺 map rendered");
+};
 
-  marker = new google.maps.Marker({
-    map,
-    position: SHOP_CENTER,
-    draggable: true,
-  });
-
-  checkArea(); // เช็กครั้งแรก
-
-  marker.addListener("dragend", checkArea);
-}
 
 function checkArea() {
   const distance =
