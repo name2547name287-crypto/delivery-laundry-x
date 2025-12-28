@@ -85,7 +85,14 @@ input, select {
   padding: 10px;
 }
 </style>
-
+<style>
+#map {
+  width: 100%;
+  height: 300px;   /* ถ้าไม่มีบรรทัดนี้ = ไม่ขึ้น */
+  border-radius: 12px;
+  margin-top: 10px;
+}
+</style>
 <body>
 
 <div class="app">
@@ -122,10 +129,12 @@ input, select {
       <strong id="price">-</strong>
     </div>
 
-    <h3>📍 เลือกจุดรับผ้า</h3>
-<div id="map" style="height:300px;border-radius:12px;"></div>
-<p id="areaStatus" style="margin-top:8px;font-weight:bold;"></p>
-    <button class="pr
+<h3>📍 เลือกจุดรับผ้า</h3>
+<div id="map"></div>
+<p id="areaStatus"></p>
+<p id="distanceInfo"></p>    
+
+<button class="pr
     imary-btn" onclick="submitBooking()">
       ยืนยันการจอง
     </button>
