@@ -1,46 +1,39 @@
 console.log("✅ auth.js loaded");
 
-async function register() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const username = document.getElementById("username").value.trim();
+function register() {
+  const username = document.getElementById("regUsername").value;
+  const phone = document.getElementById("regPhone").value;
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
 
-  if (!email || !password || !username) {
-    alert("กรอกข้อมูลให้ครบ");
-    return;
-  }
-
-  try {
-    const res = await auth.createUserWithEmailAndPassword(email, password);
-
-    await db.collection("users").doc(res.user.uid).set({
-      username: username,
-      role: "customer",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    alert("สมัครสำเร็จ");
-  } catch (err) {
-    alert(err.message);
-  }
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      return db.collection("users").doc(cred.user.uid).set({
+        username,
+        phone,
+        email,
+        role: "customer",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch(err => alert(err.message));
 }
 
-async function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
 
-  if (!email || !password) {
-    alert("กรอก email และ password");
-    return;
-  }
+function login() {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
 
-  try {
-    await auth.signInWithEmailAndPassword(email, password);
-    alert("เข้าสู่ระบบสำเร็จ");
-  } catch (err) {
-    alert(err.message);
-  }
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      window.location.href = "index.html";
+    })
+    .catch(err => alert(err.message));
 }
+
 
 function register() {
   const email = emailEl.value;
@@ -75,9 +68,11 @@ auth.onAuthStateChanged(async user => {
     return;
   }
 
-  const el = document.getElementById("username");
-  if (el) {
-    el.innerText = "สวัสดี 👋 " + (user.email || "ลูกค้า");
+  const snap = await db.collection("users").doc(user.uid).get();
+  if (snap.exists) {
+    document.getElementById("username").innerText =
+      "สวัสดี 👋 " + snap.data().username;
   }
 });
+
 
