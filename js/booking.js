@@ -1,4 +1,4 @@
-alert("booking.js loaded");
+ alert("booking.js loaded");
 
 const NIGHT_SLOTS = [
   "21:00",
