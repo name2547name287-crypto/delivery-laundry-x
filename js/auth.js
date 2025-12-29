@@ -69,25 +69,15 @@ function logout() {
   });
 }
 
-auth.onAuthStateChanged(user => {
-  const el = document.getElementById("username");
-  if (!el) return;
-
-  if (user) {
-    el.innerText = "สวัสดี 👋 " + (user.email || "ลูกค้า");
-  } else {
+auth.onAuthStateChanged(async user => {
+  if (!user) {
     location.href = "login.html";
+    return;
+  }
+
+  const el = document.getElementById("username");
+  if (el) {
+    el.innerText = "สวัสดี 👋 " + (user.email || "ลูกค้า");
   }
 });
 
-
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("menuBtn");
-  const menu = document.getElementById("menu");
-
-  if (btn && menu) {
-    btn.onclick = () => {
-      menu.classList.toggle("hidden");
-    };
-  }
-});

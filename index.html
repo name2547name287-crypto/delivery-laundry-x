@@ -355,29 +355,6 @@ body {
 </script>
 
 <script>
-const menuBtn = document.getElementById("menu-btn");
-const menuPanel = document.getElementById("menu-panel");
-
-menuBtn.onclick = () => {
-  menuPanel.classList.toggle("hidden");
-};
-
-auth.onAuthStateChanged(async user => {
-  if (!user) {
-    location.href = "login.html";
-    return;
-  }
-
-  const doc = await db.collection("users").doc(user.uid).get();
-  if (doc.exists) {
-    const data = doc.data();
-    document.getElementById("menu-name").innerText = `สวัสดี ${data.username}`;
-    document.getElementById("user-info").innerText = data.phone || "";
-  }
-});
-</script>
-
-<script>
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("menuBtn");
   const menu = document.getElementById("menu");
