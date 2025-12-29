@@ -161,12 +161,30 @@ body {
   padding-top: 60px; /* ดันเนื้อหาลงให้พ้นแถบดำ */
 }
 
+.hidden {
+  display: none;
+}
+
+.menu {
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: #b71c1c;
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 9999;
+}
+
+
 </style>
 <body>
-<div class="topbar">
-  <span id="username">สวัสดี 👋</span>
-  <button class="menu-btn">☰</button>
+<button id="menuBtn">☰</button>
+
+<div id="menu" class="menu hidden">
+  <button onclick="location.href='profile.html'">✏️ แก้ไขข้อมูลลูกค้า</button>
+  <button onclick="logout()">📕 ออกจากระบบ</button>
 </div>
+
 
 <div id="menu-panel" class="hidden">
   <div id="user-info"></div>

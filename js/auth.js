@@ -77,3 +77,14 @@ auth.onAuthStateChanged(user => {
     }
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("menuBtn");
+  const menu = document.getElementById("menu");
+
+  if (btn && menu) {
+    btn.onclick = () => {
+      menu.classList.toggle("hidden");
+    };
+  }
+});
