@@ -1,9 +1,9 @@
 console.log("✅ auth.js loaded");
 
 async function register() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const username = document.getElementById("username").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const username = document.getElementById("username").value.trim();
 
   if (!email || !password || !username) {
     alert("กรอกข้อมูลให้ครบ");
@@ -20,19 +20,23 @@ async function register() {
     });
 
     alert("สมัครสำเร็จ");
-    window.location.href = "index.html";
   } catch (err) {
     alert(err.message);
   }
 }
 
 async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!email || !password) {
+    alert("กรอก email และ password");
+    return;
+  }
 
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    window.location.href = "index.html";
+    alert("เข้าสู่ระบบสำเร็จ");
   } catch (err) {
     alert(err.message);
   }
