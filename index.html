@@ -113,6 +113,7 @@ input, select {
   font-size: 16px;
 }
 
+
 </style>
 <body>
 
@@ -190,9 +191,25 @@ input, select {
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fTECPU9pSqKwV4bff8VwSxqYEuGsUPI&libraries=geometry&callback=initMap"
   async
+
 ></script>
 
 <script src="js/booking.js"></script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script src="js/firebase.js"></script>
+<script src="js/booking.js"></script>
+<script>
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  });
+</script>
 
 </body>
 
