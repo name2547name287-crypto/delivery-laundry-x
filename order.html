@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สถานะออเดอร์</title>
+<link rel="stylesheet" href="css/app.css">
+<style>
+.order-card {
+  background: #111;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+.status {
+  font-weight: bold;
+  margin-top: 6px;
+}
+.status.wait { color: orange; }
+.status.pick { color: dodgerblue; }
+.status.done { color: lightgreen; }
+</style>
+</head>
+
+<body>
+
+<h2>📦 ออเดอร์ของฉัน</h2>
+<div id="orderList">กำลังโหลด...</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+
+<script>
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
+
+  const snap = await db.collection("orders")
+    .where("userId", "==", user.uid)
+    .orderBy("createdAt", "desc")
+    .get();
+
+  const box = document.getElementById("orderList");
+  box.innerHTML = "";
+
+  snap.forEach(doc => {
+    const o = doc.data();
+    box.innerHTML += `
+      <div class="order-card">
+        <div>🧺 น้ำหนัก: ${o.weight} kg</div>
+        <div>💰 ราคา: ${o.price} บาท</div>
+        <div class="status ${o.status}">
+          สถานะ: ${o.status}
+        </div>
+      </div>
+    `;
+  });
+});
+</script>
+
+</body>
+</html>
