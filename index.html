@@ -1,309 +1,199 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Delivery Laundry X</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  </head>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: #f5f5f5;
+      padding-top: 55px; /* กัน topbar บัง */
+    }
 
-<style>
-* {
-  box-sizing: border-box;
-}
+    /* ===== TOP BAR ===== */
+    #topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 55px;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      z-index: 1000;
+    }
 
-body {
-  margin: 0;
-  background: #f2f2f2;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-}
+    #menuBtn {
+      font-size: 22px;
+      cursor: pointer;
+    }
 
-.app {
-  max-width: 420px;
-  margin: auto;
-  background: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+    /* ===== MENU ===== */
+    #menu-panel {
+      position: fixed;
+      top: 55px;
+      right: 10px;
+      background: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 999;
+    }
 
-.app-header {
-  background: #d32f2f;
-  color: #fff;
-  padding: 20px;
-  text-align: center;
-}
+    #menu-panel button {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      background: #c62828;
+      color: #fff;
+      font-size: 15px;
+      text-align: left;
+      cursor: pointer;
+    }
 
-.app-content {
-  flex: 1;
-  padding: 20px;
-}
+    #menu-panel button:not(:last-child) {
+      border-bottom: 1px solid rgba(255,255,255,.2);
+    }
 
-label {
-  font-size: 14px;
-  margin-top: 10px;
-  display: block;
-}
+    .hidden {
+      display: none;
+    }
 
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 6px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-}
+    /* ===== APP ===== */
+    .app {
+      max-width: 480px;
+      margin: auto;
+    }
 
-.price-box {
-  margin: 20px 0;
-  padding: 15px;
-  background: #f8f8f8;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 18px;
-}
+    .app-header {
+      background: #c62828;
+      color: #fff;
+      padding: 16px;
+      text-align: center;
+    }
 
-.primary-btn {
-  width: 100%;
-  padding: 16px;
-  background: #d32f2f;
-  color: #fff;
-  border: none;
-  border-radius: 14px;
-  font-size: 18px;
-}
+    .app-content {
+      padding: 16px;
+    }
 
-.primary-btn:active {
-  background: #b71c1c;
-}
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
 
-.app-footer {
-  text-align: center;
-  font-size: 12px;
-  color: #777;
-  padding: 10px;
-}
+    button.primary {
+      background: #c62828;
+      color: #fff;
+      border: none;
+      font-weight: bold;
+    }
 
+    #map {
+      width: 100%;
+      height: 280px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
 
-#map {
-  width: 100%;
-  height: 320px;
-  min-height: 320px;
-  border-radius: 12px;
-  margin-top: 10px;
-  touch-action: manipulation;
-}
+    .status {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
 
-#map * {
-  touch-action: manipulation;
-}
-#map {
-  touch-action: pan-x pan-y;
-}
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 13px;
+    }
+  </style>
+</head>
 
-
-
-.info-box {
-  margin-top: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: #fafafa;
-  font-size: 16px;
-}
-
-#topbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #111;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 16px;
-  z-index: 1000;
-}
-
-#menu-btn {
-  font-size: 22px;
-  cursor: pointer;
-}
-
-#menu-panel {
-  position: fixed;
-  top: 55px;
-  right: 15px;
-  background: #222;
-  border-radius: 10px;
-  padding: 10px;
-  width: 220px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-}
-
-#menu-panel button {
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background: #b71c1c;
-  color: #fff;
-  cursor: pointer;
-}
-
-.hidden {
-  display: none;
-}
-
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
-  z-index: 1000;
-}
-
-.main-content {
-  padding-top: 80px; /* ดันลงมากกว่า header นิดนึง */
-}
-
-</style>
 <body>
+
+<!-- ===== TOP BAR ===== -->
 <div id="topbar">
-  <div id="menu-name">สวัสดี 👋</div>
-  <div id="menu-btn">☰</div>
+  <div id="username">สวัสดี 👋</div>
+  <div id="menuBtn">☰</div>
 </div>
 
+<!-- ===== MENU PANEL ===== -->
 <div id="menu-panel" class="hidden">
-  <div id="user-info"></div>
-<button onclick="location.href='profile.html'">
-  ✏️ แก้ไขข้อมูลลูกค้า
-</button>  <button onclick="logout()">🚪 ออกจากระบบ</button>
+  <button onclick="location.href='profile.html'">✏️ แก้ไขข้อมูลลูกค้า</button>
+  <button onclick="logout()">🚪 ออกจากระบบ</button>
 </div>
-<div class="app">
 
+<!-- ===== APP ===== -->
+<div class="app">
   <header class="app-header">
-    <h1>Delivery Laundry X</h1>
+    <h2>Delivery Laundry X</h2>
     <p>บริการรับ–ส่งซักผ้า</p>
   </header>
-<div class="main-content"></div>
-
 
   <main class="app-content">
 
     <label>น้ำหนัก (kg)</label>
-    <input id="weight" type="number" value="10" min="10" oninput="updatePrice()">
-
+    <input id="weight" type="number" value="10" min="1"/>
 
     <label>เลือกรอบจอง</label>
-<select id="timeSlot" onchange="updatePrice()">
-  <option value="">-- เลือกรอบ --</option>
+    <select id="timeSlot">
+      <option value="">-- เลือกรอบ --</option>
+      <option value="09:00">09:00 – 12:00</option>
+      <option value="13:00">13:00 – 17:00</option>
+      <option value="21:00">21:00 – 02:00 (รอบดึก)</option>
+    </select>
 
-  <optgroup label="☀️ รอบเช้า">
-    <option value="08:00">08:00 – 10:00</option>
-    <option value="10:00">10:00 – 11:30</option>
-    <option value="12:30">12:30 – 13:30</option>
-    <option value="13:30">13:30 – 15:00</option>
-  </optgroup>
+    <div class="status" id="areaStatus">📍 กรุณาเลือกจุดรับผ้าบนแผนที่</div>
 
-  <optgroup label="🌙 รอบดึก">
-    <option value="19:30">19:30 – 21:00</option>
-    <option value="21:00">21:00 – 22:30 +10฿</option>
-    <option value="22:30">22:30 – 00:00 +10฿</option>
-    <option value="00:00">00:00 – 02:00 +10฿</option>
-  </optgroup>
-</select>
+    <div id="map"></div>
 
+    <div class="status" id="price">💰 ราคาประมาณ: -</div>
 
-    <label>วันที่รับงาน</label>
-    <input id="bookingDate" type="date">
-<div class="price-box">
-      <strong id="price">-</strong>  
-  
-    </div>
-  
-
-<h3>📍 เลือกจุดรับผ้า</h3>
-
-<button type="button" onclick="useMyLocation()">
-📍 ใช้ตำแหน่งปัจจุบัน
-</button>
-
-<div id="map"></div>
-<div class="info-box">
-  <p id="distanceText">📍 ระยะทาง: -</p>
-  <p id="areaStatus">สถานะพื้นที่: -</p>
-
-<h3>📞 ข้อมูลติดต่อ</h3>
-
-<input id="customerName" placeholder="ชื่อผู้ติดต่อ" required>
-<input id="customerPhone" placeholder="เบอร์โทร" type="tel" required>
-<textarea id="customerNote" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)"></textarea>
-
-
-  <button class="primary-btn" onclick="submitBooking()">      ยืนยันการจอง
-    </button>
+    <button class="primary">ยืนยันการจอง</button>
 
   </main>
 
-  <footer class="app-footer">
-    Delivery Laundry X ©
-  </footer>
-
+  <footer>Delivery Laundry X ©</footer>
 </div>
 
-
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fTECPU9pSqKwV4bff8VwSxqYEuGsUPI&libraries=geometry&callback=initMap"
-  async
-
-></script>
-
-
-<!-- Firebase SDK -->
+<!-- ===== FIREBASE ===== -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script src="js/firebase.js"></script>
 <script src="js/auth.js"></script>
+
+<!-- ===== GOOGLE MAP ===== -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_MAP_KEY&libraries=geometry&callback=initMap"
+  async defer>
+</script>
+
 <script src="js/booking.js"></script>
+
 <script>
+  // menu toggle
+  menuBtn.onclick = () =>
+    document.getElementById("menu-panel").classList.toggle("hidden");
+
+  // auth guard + username
   auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = "login.html";
-    }
+    if (!user) location.href = "login.html";
+    document.getElementById("username").innerText =
+      "สวัสดี 👋 " + (user.email || "ลูกค้า");
   });
 </script>
 
-<script>
-const menuBtn = document.getElementById("menu-btn");
-const menuPanel = document.getElementById("menu-panel");
-
-menuBtn.onclick = () => {
-  menuPanel.classList.toggle("hidden");
-};
-
-auth.onAuthStateChanged(async user => {
-  if (!user) {
-    location.href = "login.html";
-    return;
-  }
-
-  const doc = await db.collection("users").doc(user.uid).get();
-  if (doc.exists) {
-    const data = doc.data();
-    document.getElementById("menu-name").innerText = `สวัสดี ${data.username}`;
-    document.getElementById("user-info").innerText = data.phone || "";
-  }
-});
-</script>
-
-</div>
-
 </body>
-
 </html>
