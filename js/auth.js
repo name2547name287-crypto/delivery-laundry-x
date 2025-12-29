@@ -36,26 +36,23 @@ function login() {
 
 
 function register() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const username = document.getElementById("username").value;
-
-  if (!email || !password || !username) {
-    alert("กรุณากรอกข้อมูลให้ครบ");
-    return;
-  }
+  const username = document.getElementById("regUsername").value;
+  const phone = document.getElementById("regPhone").value;
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
 
   auth.createUserWithEmailAndPassword(email, password)
     .then(cred => {
       return db.collection("users").doc(cred.user.uid).set({
-        username: username,
-        email: email,
+        username,
+        phone,
+        email,
         role: "customer",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     })
     .then(() => {
-      location.href = "index.html";
+      window.location.href = "index.html";
     })
     .catch(err => alert(err.message));
 }
