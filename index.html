@@ -358,7 +358,9 @@ body {
 const menuBtn = document.getElementById("menu-btn");
 const menuPanel = document.getElementById("menu-panel");
 
-
+menuBtn.onclick = () => {
+  menuPanel.classList.toggle("hidden");
+};
 
 auth.onAuthStateChanged(async user => {
   if (!user) {
@@ -374,8 +376,8 @@ auth.onAuthStateChanged(async user => {
   }
 });
 </script>
-<script>
 
+<script>
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("menuBtn");
   const menu = document.getElementById("menu");
