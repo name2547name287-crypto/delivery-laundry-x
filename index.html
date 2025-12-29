@@ -365,6 +365,30 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+<script>
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
+
+  try {
+    const doc = await db.collection("users").doc(user.uid).get();
+
+    if (doc.exists) {
+      const data = doc.data();
+      const name = data.username || user.email;
+      document.getElementById("username").innerText =
+        `สวัสดี ${name} 👋`;
+    } else {
+      document.getElementById("username").innerText =
+        `สวัสดี ${user.email} 👋`;
+    }
+  } catch (err) {
+    console.error("โหลดชื่อผู้ใช้ไม่สำเร็จ", err);
+  }
+});
+</script>
 
 
 </body>
