@@ -1,10 +1,22 @@
-<h2>เข้าสู่ระบบ</h2>
+<head>
+   <link rel="stylesheet" href="css/auth.css"> 
+</head>
+<body>
+<div class="auth-card">
+  <h2>Delivery Laundry X</h2>
+  <div class="auth-subtitle">เข้าสู่ระบบ</div>
 
-<input id="loginEmail" type="email" placeholder="อีเมล">
-<input id="loginPassword" type="password" placeholder="รหัสผ่าน">
+  <input id="loginEmail" type="email" placeholder="อีเมล">
+  <input id="loginPassword" type="password" placeholder="รหัสผ่าน">
 
-<button onclick="login()">เข้าสู่ระบบ</button>
+  <button class="btn-primary" onclick="login()">เข้าสู่ระบบ</button>
 
+  <div class="auth-footer">
+    ยังไม่มีบัญชี?
+    <a href="register.html">สมัครสมาชิก</a>
+  </div>
+</div>
+</body>
 <p>
   ยังไม่มีบัญชี?
   <a href="register.html">สมัครสมาชิก</a>
@@ -26,3 +38,4 @@ auth.onAuthStateChanged(user => {
   if (user) location.href = "index.html";
 });
 </script>
+

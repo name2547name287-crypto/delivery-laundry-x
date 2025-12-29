@@ -15,7 +15,7 @@ let currentDistance = 0;
 
 // ===== CONFIG =====
 const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
-const SERVICE_RADIUS = 1000;
+const SERVICE_RADIUS = 750;
 
 // ===== PRICE =====
 function updatePrice() {
@@ -38,9 +38,9 @@ function updatePrice() {
   let price = weight * 2;
 
   if (currentDistance <= 500) price += 20;
-  else if (currentDistance <= 1000) price += 30;
+  else if (currentDistance <= 750) price += 30;
   else {
-    priceEl.innerText = "❌ เกินระยะให้บริการ";
+    priceEl.innerText = "❌ นอกพื้นที่ให้บริการ";
     return;
   }
 
