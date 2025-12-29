@@ -164,4 +164,12 @@ function submitBooking() {
   alert("✅ พร้อมบันทึกการจอง (ขั้นถัดไปคือ Firebase)");
 }
 
+function openProfile() {
+  alert("กำลังพัฒนา");
+}
 
+function logout() {
+  auth.signOut().then(() => {
+    location.href = "login.html";
+  });
+}
