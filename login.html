@@ -21,3 +21,8 @@
 <!-- Auth logic -->
 <script src="js/auth.js"></script>
 
+<script>
+auth.onAuthStateChanged(user => {
+  if (user) location.href = "index.html";
+});
+</script>

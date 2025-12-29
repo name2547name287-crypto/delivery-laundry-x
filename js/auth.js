@@ -57,24 +57,55 @@ function register() {
     .catch(err => alert(err.message));
 }
 
+console.log("✅ auth.js loaded");
 
-function logout() {
-  auth.signOut().then(() => {
-    window.location.href = "login.html";
-  });
+// LOGIN
+function login() {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      location.href = "index.html";
+    })
+    .catch(err => alert(err.message));
 }
 
-auth.onAuthStateChanged(async user => {
-  if (!user) {
-    location.href = "login.html";
+// REGISTER
+function register() {
+  const username = document.getElementById("regUsername").value;
+  const phone = document.getElementById("regPhone").value;
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
+
+  if (!username || !email || !password) {
+    alert("กรุณากรอกข้อมูลให้ครบ");
     return;
   }
 
-  const snap = await db.collection("users").doc(user.uid).get();
-  if (snap.exists) {
-    document.getElementById("username").innerText =
-      "สวัสดี 👋 " + snap.data().username;
-  }
-});
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      return db.collection("users").doc(cred.user.uid).set({
+        username,
+        phone,
+        email,
+        role: "customer",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(() => {
+      location.href = "index.html";
+    })
+    .catch(err => alert(err.message));
+}
+
+// LOGOUT
+function logout() {
+  auth.signOut().then(() => {
+    location.href = "login.html";
+  });
+}
+
+
 
 
