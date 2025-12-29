@@ -163,3 +163,5 @@ function submitBooking() {
 
   alert("✅ พร้อมบันทึกการจอง (ขั้นถัดไปคือ Firebase)");
 }
+
+

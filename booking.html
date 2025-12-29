@@ -1,0 +1,94 @@
+ <!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จองรับผ้า | Delivery Laundry X</title>
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #111;
+      color: #fff;
+      padding: 70px 15px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      background: #b71c1c;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #price {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #map {
+      height: 280px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    #areaStatus {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>จองรับผ้า</h2>
+
+  <!-- ข้อมูลลูกค้า -->
+  <input id="customerName" placeholder="ชื่อผู้ใช้" disabled>
+  <input id="phone" placeholder="เบอร์โทร">
+  <textarea id="address" placeholder="ที่อยู่รับผ้า"></textarea>
+
+  <!-- ข้อมูลการจอง -->
+  <select id="timeSlot" onchange="updatePrice()">
+    <option value="10:00">10:00 - 13:00</option>
+    <option value="13:00">13:00 - 17:00</option>
+    <option value="17:00">17:00 - 21:00</option>
+    <option value="21:00">21:00 - 02:00 (รอบดึก)</option>
+  </select>
+
+  <input id="weight" type="number" value="10" min="10" onchange="updatePrice()">
+
+  <div id="map"></div>
+  <div id="areaStatus">📍 กรุณาเลือกจุดรับผ้าบนแผนที่</div>
+
+  <div id="price">💰 ราคาประมาณ: -</div>
+
+  <button onclick="submitBooking()">ยืนยันการจอง</button>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fTECPU9pSqKwV4bff8VwSxqYEuGsUPI&libraries=geometry&callback=initMap" async defer></script>
+
+  <!-- Your JS -->
+  <script src="js/firebase.js"></script>
+  <script src="js/booking.js"></script>
+
+</body>
+</html>
