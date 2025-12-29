@@ -36,17 +36,21 @@ function login() {
 
 
 function register() {
-  const email = emailEl.value;
-  const password = passwordEl.value;
-  const username = usernameEl.value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value;
+
+  if (!email || !password || !username) {
+    alert("กรุณากรอกข้อมูลให้ครบ");
+    return;
+  }
 
   auth.createUserWithEmailAndPassword(email, password)
     .then(cred => {
       return db.collection("users").doc(cred.user.uid).set({
-        username,
-        email,
-        phone: "",
-        address: "",
+        username: username,
+        email: email,
+        role: "customer",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     })
@@ -55,6 +59,7 @@ function register() {
     })
     .catch(err => alert(err.message));
 }
+
 
 function logout() {
   auth.signOut().then(() => {
