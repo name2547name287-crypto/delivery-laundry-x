@@ -175,6 +175,63 @@ body {
   z-index: 9999;
 }
 
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  z-index: 10000;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.menu {
+  position: fixed;
+  top: 60px;
+  right: 10px;
+  background: #b71c1c;
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 10001;
+}
+
+.menu button {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  background: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.hidden {
+  display: none;
+}
+
+body {
+  padding-top: 60px;
+}
+
 
 </style>
 <body>
@@ -321,20 +378,22 @@ auth.onAuthStateChanged(async user => {
 </script>
 <script>
 
+<script>
 document.addEventListener("DOMContentLoaded", () => {
-  const menuBtn = document.getElementById("menuBtn");
+  const btn = document.getElementById("menuBtn");
   const menu = document.getElementById("menu");
 
-  if (!menuBtn || !menu) {
-    console.warn("❌ menuBtn หรือ menu ไม่พบใน DOM");
+  if (!btn || !menu) {
+    console.log("❌ menuBtn หรือ menu ไม่พบ");
     return;
   }
 
-  menuBtn.addEventListener("click", () => {
+  btn.addEventListener("click", () => {
     menu.classList.toggle("hidden");
   });
 });
 </script>
+
 
 
 </body>
