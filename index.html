@@ -157,6 +157,19 @@ input, select {
   display: none;
 }
 
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  z-index: 1000;
+}
+
+.main-content {
+  padding-top: 80px; /* ดันลงมากกว่า header นิดนึง */
+}
+
 </style>
 <body>
 <div id="topbar">
@@ -166,8 +179,9 @@ input, select {
 
 <div id="menu-panel" class="hidden">
   <div id="user-info"></div>
-  <button onclick="openProfile()">📝 แก้ไขข้อมูลลูกค้า</button>
-  <button onclick="logout()">🚪 ออกจากระบบ</button>
+<button onclick="location.href='profile.html'">
+  ✏️ แก้ไขข้อมูลลูกค้า
+</button>  <button onclick="logout()">🚪 ออกจากระบบ</button>
 </div>
 <div class="app">
 
@@ -175,6 +189,8 @@ input, select {
     <h1>Delivery Laundry X</h1>
     <p>บริการรับ–ส่งซักผ้า</p>
   </header>
+<div class="main-content"></div>
+
 
   <main class="app-content">
 
@@ -253,6 +269,7 @@ input, select {
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/booking.js"></script>
 <script>
   auth.onAuthStateChanged(user => {
@@ -284,6 +301,8 @@ auth.onAuthStateChanged(async user => {
   }
 });
 </script>
+
+</div>
 
 </body>
 

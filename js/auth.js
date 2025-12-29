@@ -62,3 +62,9 @@ function register() {
     })
     .catch(err => alert(err.message));
 }
+
+function logout() {
+  auth.signOut().then(() => {
+    window.location.href = "login.html";
+  });
+}
