@@ -68,3 +68,12 @@ function logout() {
     window.location.href = "login.html";
   });
 }
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    const nameEl = document.getElementById("username");
+    if (nameEl) {
+      nameEl.innerText = "สวัสดี 👋 " + (user.email || "ลูกค้า");
+    }
+  }
+});

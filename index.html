@@ -157,11 +157,15 @@ input, select {
   display: none;
 }
 
+body {
+  padding-top: 60px; /* ดันเนื้อหาลงให้พ้นแถบดำ */
+}
+
 </style>
 <body>
-<div id="topbar">
-  <div id="menu-name">สวัสดี 👋</div>
-  <div id="menu-btn">☰</div>
+<div class="topbar">
+  <span id="username">สวัสดี 👋</span>
+  <button class="menu-btn">☰</button>
 </div>
 
 <div id="menu-panel" class="hidden">
