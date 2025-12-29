@@ -178,12 +178,24 @@ body {
 
 </style>
 <body>
-<button id="menuBtn">☰</button>
+  <!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <strong class="brand">Delivery Laundry X</strong>
+  </div>
 
+  <div class="topbar-right">
+    <span id="username">สวัสดี 👋</span>
+    <button id="menuBtn" class="menu-btn">☰</button>
+  </div>
+</div>
+
+<!-- MENU -->
 <div id="menu" class="menu hidden">
   <button onclick="location.href='profile.html'">✏️ แก้ไขข้อมูลลูกค้า</button>
-  <button onclick="logout()">📕 ออกจากระบบ</button>
+  <button onclick="logout()">🚪 ออกจากระบบ</button>
 </div>
+
 
 
 <div id="menu-panel" class="hidden">
@@ -307,6 +319,23 @@ auth.onAuthStateChanged(async user => {
   }
 });
 </script>
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+  const menuBtn = document.getElementById("menuBtn");
+  const menu = document.getElementById("menu");
+
+  if (!menuBtn || !menu) {
+    console.warn("❌ menuBtn หรือ menu ไม่พบใน DOM");
+    return;
+  }
+
+  menuBtn.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+  });
+});
+</script>
+
 
 </body>
 

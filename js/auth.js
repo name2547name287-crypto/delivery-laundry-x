@@ -70,13 +70,16 @@ function logout() {
 }
 
 auth.onAuthStateChanged(user => {
+  const el = document.getElementById("username");
+  if (!el) return;
+
   if (user) {
-    const nameEl = document.getElementById("username");
-    if (nameEl) {
-      nameEl.innerText = "สวัสดี 👋 " + (user.email || "ลูกค้า");
-    }
+    el.innerText = "สวัสดี 👋 " + (user.email || "ลูกค้า");
+  } else {
+    location.href = "login.html";
   }
 });
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("menuBtn");
