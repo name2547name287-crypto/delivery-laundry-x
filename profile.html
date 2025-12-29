@@ -1,0 +1,29 @@
+ <h2>ข้อมูลลูกค้า</h2>
+
+<input id="phone" placeholder="เบอร์โทร">
+<input id="address" placeholder="ที่อยู่รับผ้า">
+
+<button onclick="saveProfile()">บันทึก</button>
+
+<script src="js/firebase.js"></script>
+<script>
+auth.onAuthStateChanged(async user => {
+  if (!user) location.href = "login.html";
+
+  const doc = await db.collection("users").doc(user.uid).get();
+  if (doc.exists) {
+    phone.value = doc.data().phone || "";
+    address.value = doc.data().address || "";
+  }
+});
+
+function saveProfile() {
+  auth.currentUser && db.collection("users")
+    .doc(auth.currentUser.uid)
+    .update({
+      phone: phone.value,
+      address: address.value
+    })
+    .then(() => alert("บันทึกเรียบร้อย"));
+}
+</script>

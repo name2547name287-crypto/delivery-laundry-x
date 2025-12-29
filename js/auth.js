@@ -41,3 +41,24 @@ async function login() {
     alert(err.message);
   }
 }
+
+function register() {
+  const email = emailEl.value;
+  const password = passwordEl.value;
+  const username = usernameEl.value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(cred => {
+      return db.collection("users").doc(cred.user.uid).set({
+        username,
+        email,
+        phone: "",
+        address: "",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(() => {
+      location.href = "index.html";
+    })
+    .catch(err => alert(err.message));
+}

@@ -113,10 +113,62 @@ input, select {
   font-size: 16px;
 }
 
+#topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #111;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px;
+  z-index: 1000;
+}
+
+#menu-btn {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+#menu-panel {
+  position: fixed;
+  top: 55px;
+  right: 15px;
+  background: #222;
+  border-radius: 10px;
+  padding: 10px;
+  width: 220px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+
+#menu-panel button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #b71c1c;
+  color: #fff;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
 
 </style>
 <body>
+<div id="topbar">
+  <div id="menu-name">สวัสดี 👋</div>
+  <div id="menu-btn">☰</div>
+</div>
 
+<div id="menu-panel" class="hidden">
+  <div id="user-info"></div>
+  <button onclick="openProfile()">📝 แก้ไขข้อมูลลูกค้า</button>
+  <button onclick="logout()">🚪 ออกจากระบบ</button>
+</div>
 <div class="app">
 
   <header class="app-header">
@@ -209,6 +261,29 @@ input, select {
       window.location.href = "login.html";
     }
   });
+</script>
+
+<script>
+const menuBtn = document.getElementById("menu-btn");
+const menuPanel = document.getElementById("menu-panel");
+
+menuBtn.onclick = () => {
+  menuPanel.classList.toggle("hidden");
+};
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
+
+  const doc = await db.collection("users").doc(user.uid).get();
+  if (doc.exists) {
+    const data = doc.data();
+    document.getElementById("menu-name").innerText = `สวัสดี ${data.username}`;
+    document.getElementById("user-info").innerText = data.phone || "";
+  }
+});
 </script>
 
 </body>
