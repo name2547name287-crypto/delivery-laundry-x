@@ -64,6 +64,15 @@ h2, h3 {
 
 <h2>📊 Admin Dashboard</h2>
 
+<h3>⚙️ ตั้งค่าระบบ</h3>
+
+<input id="cfgRadius" placeholder="รัศมีบริการ (เมตร)">
+<input id="cfgPrice" placeholder="ราคาต่อกิโล">
+<input id="cfgNight" placeholder="ค่ารอบดึก">
+
+<button onclick="saveConfig()">💾 บันทึก</button>
+
+
 <h3>📦 ออเดอร์ปัจจุบัน</h3>
 <div id="currentOrders"></div>
 
@@ -140,6 +149,8 @@ const html = `
   <div class="order">
     <div class="name">👤 ${o.username || "-"}</div>
     <div class="sub">📞 ${o.phone || "-"}</div>
+    <div>📝 รายละเอียด: ${o.note || "-"}</div>
+
 
     <div class="sub">🧺 ${o.weight} kg | 💰 ${o.price} บาท</div>
     <div class="sub">📌 สถานะ: ${o.status}</div>
@@ -179,6 +190,17 @@ function updateStatus(orderId, status) {
     loadOrders();
   });
 }
+
+async function saveConfig() {
+  await db.collection("config").doc("app").set({
+    serviceRadius: Number(cfgRadius.value),
+    pricePerKg: Number(cfgPrice.value),
+    nightFee: Number(cfgNight.value)
+  });
+  alert("บันทึกแล้ว");
+}
+// โหลดค่าตั้งต้น
+
 </script>
 
 </body>

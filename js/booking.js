@@ -15,7 +15,8 @@ let currentDistance = 0;
 
 // ===== CONFIG =====
 const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
-const SERVICE_RADIUS = 750;
+let SERVICE_RADIUS = APP_CONFIG.serviceRadius || 750;
+
 
 // ===== PRICE =====
 function updatePrice() {
@@ -35,7 +36,7 @@ function updatePrice() {
     return;
   }
 
-  let price = weight * 2;
+  let price = weight * (APP_CONFIG.pricePerKg || 2);
 
   if (currentDistance <= 500) price += 20;
   else if (currentDistance <= 750) price += 30;
@@ -44,9 +45,10 @@ function updatePrice() {
     return;
   }
 
-  if (NIGHT_SLOTS.includes(timeSlot)) {
-  price += 10;
-  }
+ if (NIGHT_SLOTS.includes(timeSlot)) {
+  price += APP_CONFIG.nightFee || 10;
+}
+
 
 
   priceEl.innerText = `💰 ราคาประมาณ: ${price} บาท`;
@@ -201,6 +203,7 @@ async function submitBooking() {
 
       username: customerName,
       phone: customerPhone,
+note: customerNote || "",   // ⭐ เพิ่มตรงนี้
 
       lat: lat,
       lng: lng,
@@ -220,4 +223,18 @@ async function submitBooking() {
     console.error(err);
     alert("บันทึกไม่สำเร็จ");
   }
+  
+  const customerNote = document.getElementById("customerNote").value;
+
 }
+
+let APP_CONFIG = {};
+
+async function loadConfig() {
+  const snap = await db.collection("config").doc("app").get();
+  if (snap.exists) {
+    APP_CONFIG = snap.data();
+  }
+}
+document.addEventListener("DOMContentLoaded", loadConfig);
+
