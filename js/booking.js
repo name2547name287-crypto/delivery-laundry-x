@@ -162,6 +162,18 @@ async function submitBooking() {
   }
 
   // 3. ดึงค่าจากหน้าเว็บ
+  const customerName = document.getElementById("customerName").value;
+const customerPhone = document.getElementById("customerPhone").value;
+
+if (!customerName || !customerPhone) {
+  alert("กรุณากรอกชื่อและเบอร์โทร");
+  return;
+}
+
+// พิกัดจาก marker บนแผนที่
+const lat = marker.getPosition().lat();
+const lng = marker.getPosition().lng();
+
   const weight = Number(document.getElementById("weight").value);
   const timeSlot = document.getElementById("timeSlot").value;
   const priceText = document.getElementById("price").innerText;
@@ -189,15 +201,21 @@ async function submitBooking() {
 
   // 5. บันทึก Firebase
   try {
-    await db.collection("orders").add({
-      userId: user.uid,
-      weight,
-      price,
-      timeSlot,
-      bookingDate,
-      status: "wait",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+   await db.collection("orders").add({
+  userId: user.uid,
+  customerName,
+  customerPhone,
+  weight,
+  price,
+  timeSlot,
+  bookingDate,
+  location: {
+    lat,
+    lng
+  },
+  status: "wait", // สถานะแรก
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
 
     // 6. ไปหน้าสถานะ
     window.location.href = "order.html";
