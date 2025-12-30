@@ -1,0 +1,31 @@
+.order-card {
+  background: #111;
+  color: #fff;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.order-top {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.price {
+  color: #4caf50;
+}
+
+.order-mid {
+  font-size: 14px;
+  opacity: 0.8;
+  margin-top: 6px;
+}
+
+.order-status {
+  margin-top: 10px;
+  padding: 6px;
+  border-radius: 8px;
+  background: #222;
+  text-align: center;
+}

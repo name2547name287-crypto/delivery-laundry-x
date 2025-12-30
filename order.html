@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>สถานะออเดอร์</title>
+<link rel="stylesheet" href="css/order.css">
 </head>
 <body>
 
@@ -50,15 +51,24 @@ auth.onAuthStateChanged(async user => {
   snap.forEach(doc => {
     const o = doc.data();
     box.innerHTML += `
-      <div style="margin-bottom:10px;padding:10px;border:1px solid #ccc">
-        🧺 ${o.weight} kg<br>
-        💰 ${o.price} บาท<br>
-        ⏰ ${o.bookingDate} ${o.timeSlot}<br>
-        📌 สถานะ: ${statusText(o.status)}
-      </div>
-    `;
+  <div class="order-card">
+    <div class="order-top">
+      <span>🧺 ${o.weight} kg</span>
+      <span class="price">💰 ${o.price} บาท</span>
+    </div>
+
+    <div class="order-mid">
+      ⏰ ${o.bookingDate} ${o.timeSlot}
+    </div>
+
+    <div class="order-status">
+      ${statusText(o.status)}
+    </div>
+  </div>
+`;
   });
 });
+
 </script>
 
 </body>

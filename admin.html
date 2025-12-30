@@ -7,18 +7,31 @@
 <link rel="stylesheet" href="css/app.css">
 <link rel="icon" href="data:,">
 <style>
-.stat-box {
-  background: #111;
-  padding: 16px;
-  border-radius: 14px;
-  margin-bottom: 12px;
-}
 .order {
-  background: #1c1c1c;
-  padding: 12px;
+  background: #1e1e1e;
+  color: #fff;
   border-radius: 12px;
-  margin-bottom: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
+
+.order button {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+.order button:first-child {
+  background: #ff9800;
+}
+
+.order button:last-child {
+  background: #4caf50;
+}
+
 </style>
 </head>
 
@@ -86,19 +99,32 @@ async function loadOrders() {
     const o = doc.data();
     total += o.price || 0;
 
-    const html = `
-      <div class="order">
-        👤 ${o.username || "-"} <br>
-        📞 ${o.phone || "-"} <br>
-        🧺 ${o.weight} kg <br>
-        💰 ${o.price} บาท <br>
-        📍 ${o.lat ? "มีพิกัดแผนที่" : "-"} <br>
-        📌 สถานะ: ${o.status}
-        <br><br>
-        <button onclick="updateStatus('${doc.id}','pickup')">🚚 รับผ้า</button>
-        <button onclick="updateStatus('${doc.id}','done')">✅ เสร็จสิ้น</button>
-      </div>
-    `;
+const mapLink = o.lat && o.lng
+  ? `https://www.google.com/maps?q=${o.lat},${o.lng}`
+  : "#";
+
+const html = `
+  <div class="order">
+    <div style="font-weight:bold">👤 ${o.username || "-"}</div>
+    <div>📞 ${o.phone || "-"}</div>
+    <div>🧺 ${o.weight} kg</div>
+    <div>💰 ${o.price} บาท</div>
+    <div>📌 สถานะ: ${o.status}</div>
+
+    <div style="margin-top:6px">
+      📍 
+      <a href="${mapLink}" target="_blank">
+        เปิดแผนที่
+      </a>
+    </div>
+
+    <div style="margin-top:10px">
+      <button onclick="updateStatus('${doc.id}','pickup')">🚚 รับผ้า</button>
+      <button onclick="updateStatus('${doc.id}','done')">✅ เสร็จ</button>
+    </div>
+  </div>
+`;
+
 
     if (o.status === "done") his.innerHTML += html;
     else cur.innerHTML += html;
