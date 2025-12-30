@@ -201,24 +201,34 @@ const lng = marker.getPosition().lng();
 
   // 5. บันทึก Firebase
   try {
-   await db.collection("orders").add({
-  userId: user.uid,
-  customerName,
-  customerPhone,
-  weight,
-  price,
-  timeSlot,
-  bookingDate,
-  location: {
-    lat,
-    lng
-  },
-  status: "wait", // สถานะแรก
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+   await auth.onAuthStateChanged(async user => {
+  if (!user) return;
+
+  const userSnap = await db.collection("users").doc(user.uid).get();
+  const u = userSnap.data();
+
+  await db.collection("orders").add({
+    userId: user.uid,
+
+    username: u.username || "",
+    phone: u.phone || "",
+
+    lat: selectedLat,
+    lng: selectedLng,
+
+    weight: weight,
+    price: price,
+
+    bookingDate: bookingDate,
+    timeSlot: timeSlot,
+
+    status: "wait",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  location.href = "order.html";
 });
 
-    // 6. ไปหน้าสถานะ
-    window.location.href = "order.html";
 
   } catch (err) {
     alert("บันทึกไม่สำเร็จ");
