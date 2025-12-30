@@ -148,36 +148,28 @@ function useMyLocation() {
 }
 
 async function submitBooking() {
-  // 1. เช็ก login
   const user = auth.currentUser;
   if (!user) {
     alert("กรุณาเข้าสู่ระบบ");
     return;
   }
 
-  // 2. เช็กพื้นที่
   if (!isInServiceArea) {
     alert("อยู่นอกพื้นที่ให้บริการ");
     return;
   }
 
-  // 3. ดึงค่าจากหน้าเว็บ
   const customerName = document.getElementById("customerName").value;
-const customerPhone = document.getElementById("customerPhone").value;
-
-if (!customerName || !customerPhone) {
-  alert("กรุณากรอกชื่อและเบอร์โทร");
-  return;
-}
-
-// พิกัดจาก marker บนแผนที่
-const lat = marker.getPosition().lat();
-const lng = marker.getPosition().lng();
-
-  const weight = Number(document.getElementById("weight").value);
-  const timeSlot = document.getElementById("timeSlot").value;
-  const priceText = document.getElementById("price").innerText;
+  const customerPhone = document.getElementById("customerPhone").value;
   const bookingDate = document.getElementById("bookingDate").value;
+  const timeSlot = document.getElementById("timeSlot").value;
+  const weight = Number(document.getElementById("weight").value);
+  const priceText = document.getElementById("price").innerText;
+
+  if (!customerName || !customerPhone) {
+    alert("กรุณากรอกชื่อและเบอร์โทร");
+    return;
+  }
 
   if (!bookingDate) {
     alert("กรุณาเลือกวันที่");
@@ -189,61 +181,43 @@ const lng = marker.getPosition().lng();
     return;
   }
 
-  // 4. ห้ามจองย้อนหลัง
-  const now = new Date();
   const selected = new Date(`${bookingDate} ${timeSlot}`);
-  if (selected < now) {
+  if (selected < new Date()) {
     alert("ไม่สามารถจองย้อนหลังได้");
     return;
   }
 
   const price = Number(priceText.replace(/[^\d]/g, ""));
 
-  // 5. บันทึก Firebase
-auth.onAuthStateChanged(async user => {
-  if (!user) return;
+  const lat = marker.getPosition().lat();
+  const lng = marker.getPosition().lng();
 
-  const userSnap = await db.collection("users").doc(user.uid).get();
-  const u = userSnap.data();
-
-  await db.collection("orders").add({
-    userId: user.uid,
-
-    username: u.username || "",
-    phone: u.phone || "",
-
-    lat: selectedLat,
-    lng: selectedLng,
-
-    weight: weight,
-    price: price,
-
-    bookingDate: bookingDate,
-    timeSlot: timeSlot,
-
-    status: "wait",
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  location.href = "order.html";
-});
   try {
- 
+    const userSnap = await db.collection("users").doc(user.uid).get();
+    const u = userSnap.data();
 
+    await db.collection("orders").add({
+      userId: user.uid,
+
+      username: customerName,
+      phone: customerPhone,
+
+      lat: lat,
+      lng: lng,
+
+      weight: weight,
+      price: price,
+
+      bookingDate: bookingDate,
+      timeSlot: timeSlot,
+
+      status: "wait",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    location.href = "order.html";
   } catch (err) {
-    alert("บันทึกไม่สำเร็จ");
     console.error(err);
+    alert("บันทึกไม่สำเร็จ");
   }
-}
-
-
-
-function openProfile() {
-  alert("กำลังพัฒนา");
-}
-
-function logout() {
-  auth.signOut().then(() => {
-    location.href = "login.html";
-  });
 }
