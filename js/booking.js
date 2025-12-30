@@ -1,5 +1,22 @@
  alert("booking.js loaded");
 
+let APP_CONFIG = {
+  serviceRadius: 750,
+  pricePerKg: 2,
+  nightFee: 10
+};
+
+let SERVICE_RADIUS = 750;
+
+async function loadConfig() {
+  const snap = await db.collection("config").doc("app").get();
+  if (snap.exists) {
+    APP_CONFIG = snap.data();
+    SERVICE_RADIUS = APP_CONFIG.serviceRadius || 750;
+  }
+}
+
+
 const NIGHT_SLOTS = [
   "21:00",
   "22:30",
@@ -15,7 +32,6 @@ let currentDistance = 0;
 
 // ===== CONFIG =====
 const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
-let SERVICE_RADIUS = APP_CONFIG.serviceRadius || 750;
 
 
 // ===== PRICE =====
@@ -38,6 +54,11 @@ function updatePrice() {
 
   let price = weight * (APP_CONFIG.pricePerKg || 2);
 
+if (NIGHT_SLOTS.includes(timeSlot)) {
+  price += APP_CONFIG.nightFee || 10;
+}
+
+
   if (currentDistance <= 500) price += 20;
   else if (currentDistance <= 750) price += 30;
   else {
@@ -52,7 +73,11 @@ function updatePrice() {
 
 
   priceEl.innerText = `💰 ราคาประมาณ: ${price} บาท`;
+
 }
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadConfig();
+});
 
 // ===== MAP =====
 window.initMap = function () {
@@ -151,90 +176,48 @@ function useMyLocation() {
 
 async function submitBooking() {
   const user = auth.currentUser;
-  if (!user) {
-    alert("กรุณาเข้าสู่ระบบ");
-    return;
-  }
-
-  if (!isInServiceArea) {
-    alert("อยู่นอกพื้นที่ให้บริการ");
-    return;
-  }
+  if (!user) return alert("กรุณาเข้าสู่ระบบ");
+  if (!isInServiceArea) return alert("อยู่นอกพื้นที่ให้บริการ");
 
   const customerName = document.getElementById("customerName").value;
   const customerPhone = document.getElementById("customerPhone").value;
+  const customerNote = document.getElementById("customerNote").value || "";
+
   const bookingDate = document.getElementById("bookingDate").value;
   const timeSlot = document.getElementById("timeSlot").value;
   const weight = Number(document.getElementById("weight").value);
   const priceText = document.getElementById("price").innerText;
 
-  if (!customerName || !customerPhone) {
-    alert("กรุณากรอกชื่อและเบอร์โทร");
-    return;
-  }
-
-  if (!bookingDate) {
-    alert("กรุณาเลือกวันที่");
-    return;
-  }
-
-  if (!priceText.includes("บาท")) {
-    alert("กรุณาเลือกจุดรับผ้า");
-    return;
-  }
+  if (!customerName || !customerPhone) return alert("กรุณากรอกชื่อและเบอร์");
+  if (!bookingDate) return alert("กรุณาเลือกวันที่");
+  if (!priceText.includes("บาท")) return alert("กรุณาเลือกจุดรับผ้า");
 
   const selected = new Date(`${bookingDate} ${timeSlot}`);
-  if (selected < new Date()) {
-    alert("ไม่สามารถจองย้อนหลังได้");
-    return;
-  }
+  if (selected < new Date()) return alert("ไม่สามารถจองย้อนหลังได้");
 
   const price = Number(priceText.replace(/[^\d]/g, ""));
-
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
   try {
-    const userSnap = await db.collection("users").doc(user.uid).get();
-    const u = userSnap.data();
-
     await db.collection("orders").add({
       userId: user.uid,
-
       username: customerName,
       phone: customerPhone,
-note: customerNote || "",   // ⭐ เพิ่มตรงนี้
-
-      lat: lat,
-      lng: lng,
-
-      weight: weight,
-      price: price,
-
-      bookingDate: bookingDate,
-      timeSlot: timeSlot,
-
+      note: customerNote,
+      lat,
+      lng,
+      weight,
+      price,
+      bookingDate,
+      timeSlot,
       status: "wait",
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     location.href = "order.html";
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    console.error(e);
     alert("บันทึกไม่สำเร็จ");
   }
-  
-  const customerNote = document.getElementById("customerNote").value;
-
 }
-
-let APP_CONFIG = {};
-
-async function loadConfig() {
-  const snap = await db.collection("config").doc("app").get();
-  if (snap.exists) {
-    APP_CONFIG = snap.data();
-  }
-}
-document.addEventListener("DOMContentLoaded", loadConfig);
-
