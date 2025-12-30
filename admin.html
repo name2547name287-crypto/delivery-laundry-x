@@ -24,16 +24,18 @@
 
 <body>
 
-  <h3>⚙️ ตั้งค่าระบบ</h3>
+<h2>📊 Admin Dashboard</h2>
 
-<input id="radius" placeholder="รัศมี (เมตร)">
-<input id="priceKg" placeholder="บาท / kg">
-<input id="nightExtra" placeholder="ค่ารอบดึก">
+<h3>📦 ออเดอร์ปัจจุบัน</h3>
+<div id="currentOrders"></div>
+
+<h3>📁 ประวัติออเดอร์</h3>
+<div id="historyOrders"></div>
+
 
 <button onclick="saveSettings()">บันทึกค่า</button>
 
-
-<h2>📊 Admin Dashboard</h2>
+<h3>📈 สถิติ</h3 >
 
 <div class="stat-box">
   <div>📦 ออเดอร์ทั้งหมด: <span id="totalOrder">0</span></div>
@@ -84,6 +86,42 @@ auth.onAuthStateChanged(async user => {
   document.getElementById("totalIncome").innerText = total;
 });
 </script>
+
+<script>
+auth.onAuthStateChanged(async user => {
+  if (!user) return;
+
+  const u = await db.collection("users").doc(user.uid).get();
+  if (u.data().role !== "admin") {
+    alert("ไม่มีสิทธิ์");
+    location.href = "index.html";
+    return;
+  }
+
+  const snap = await db.collection("orders")
+    .orderBy("createdAt", "desc")
+    .get();
+
+  const cur = document.getElementById("currentOrders");
+  const his = document.getElementById("historyOrders");
+
+  cur.innerHTML = "";
+  his.innerHTML = "";
+
+  snap.forEach(doc => {
+    const o = doc.data();
+    const html = `
+      <div style="border:1px solid #ccc;padding:8px;margin-bottom:6px">
+        🧺 ${o.weight} kg | 💰 ${o.price} บาท | 📌 ${o.status}
+      </div>
+    `;
+
+    if (o.status === "done") his.innerHTML += html;
+    else cur.innerHTML += html;
+  });
+});
+</script>
+
 
 </body>
 </html>
