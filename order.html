@@ -4,30 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>สถานะออเดอร์</title>
-<link rel="stylesheet" href="css/app.css">
-<style>
-.order-card {
-  background: #111;
-  padding: 16px;
-  border-radius: 14px;
-  margin-bottom: 12px;
-}
-.status {
-  font-weight: bold;
-  margin-top: 6px;
-}
-.status.wait { color: orange; }
-.status.pick { color: dodgerblue; }
-.status.done { color: lightgreen; }
-</style>
 </head>
-
 <body>
 
-<h2>📦 ออเดอร์ของฉัน</h2>
+<h2>📦 สถานะออเดอร์ของฉัน</h2>
 <div id="orderList">กำลังโหลด...</div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -51,12 +33,11 @@ auth.onAuthStateChanged(async user => {
   snap.forEach(doc => {
     const o = doc.data();
     box.innerHTML += `
-      <div class="order-card">
-        <div>🧺 น้ำหนัก: ${o.weight} kg</div>
-        <div>💰 ราคา: ${o.price} บาท</div>
-        <div class="status ${o.status}">
-          สถานะ: ${o.status}
-        </div>
+      <div style="margin-bottom:10px;padding:10px;border:1px solid #ccc">
+        🧺 ${o.weight} kg<br>
+        💰 ${o.price} บาท<br>
+        ⏰ ${o.bookingDate} ${o.timeSlot}<br>
+        📌 สถานะ: ${o.status}
       </div>
     `;
   });
