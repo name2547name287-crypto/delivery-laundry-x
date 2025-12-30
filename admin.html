@@ -50,76 +50,76 @@
 
 <script>
 auth.onAuthStateChanged(async user => {
-  if (!user) return;
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
 
   // 🔐 เช็ก role
-  const u = await db.collection("users").doc(user.uid).get();
-  if (u.data().role !== "admin") {
-    alert("ไม่มีสิทธิ์");
+  const uSnap = await db.collection("users").doc(user.uid).get();
+  if (!uSnap.exists || uSnap.data().role !== "admin") {
+    alert("ไม่มีสิทธิ์เข้า Admin");
     location.href = "index.html";
     return;
   }
 
-  const snap = await db.collection("orders").orderBy("createdAt","desc").get();
-  let total = 0;
-  document.getElementById("totalOrder").innerText = snap.size;
-
-  const box = document.getElementById("adminOrders");
-  box.innerHTML = "";
-
-  snap.forEach(doc => {
-    const o = doc.data();
-    total += o.price;
-
-    box.innerHTML += `
-      <div class="order">
-        👤 ${o.username}<br>
-        🧺 ${o.weight} kg<br>
-        💰 ${o.price} บาท<br>
-        ⏰ ${o.timeSlot}
-      </div>
-    `;
-  });
-
-  document.getElementById("totalIncome").innerText = total;
+  loadOrders();
 });
-</script>
 
-<script>
-auth.onAuthStateChanged(async user => {
-  if (!user) return;
-
-  const u = await db.collection("users").doc(user.uid).get();
-  if (u.data().role !== "admin") {
-    alert("ไม่มีสิทธิ์");
-    location.href = "index.html";
-    return;
-  }
-
+async function loadOrders() {
   const snap = await db.collection("orders")
     .orderBy("createdAt", "desc")
     .get();
 
   const cur = document.getElementById("currentOrders");
   const his = document.getElementById("historyOrders");
+  const box = document.getElementById("adminOrders");
 
   cur.innerHTML = "";
   his.innerHTML = "";
+  box.innerHTML = "";
+
+  let total = 0;
+  document.getElementById("totalOrder").innerText = snap.size;
 
   snap.forEach(doc => {
     const o = doc.data();
+    total += o.price || 0;
+
     const html = `
-      <div style="border:1px solid #ccc;padding:8px;margin-bottom:6px">
-        🧺 ${o.weight} kg | 💰 ${o.price} บาท | 📌 ${o.status}
+      <div class="order">
+        👤 ${o.username || "-"} <br>
+        📞 ${o.phone || "-"} <br>
+        🧺 ${o.weight} kg <br>
+        💰 ${o.price} บาท <br>
+        📍 ${o.lat ? "มีพิกัดแผนที่" : "-"} <br>
+        📌 สถานะ: ${o.status}
+        <br><br>
+        <button onclick="updateStatus('${doc.id}','pickup')">🚚 รับผ้า</button>
+        <button onclick="updateStatus('${doc.id}','done')">✅ เสร็จสิ้น</button>
       </div>
     `;
 
     if (o.status === "done") his.innerHTML += html;
     else cur.innerHTML += html;
+
+    box.innerHTML += html;
   });
-});
+
+  document.getElementById("totalIncome").innerText = total;
+}
+
+// 🔁 เปลี่ยนสถานะออเดอร์
+function updateStatus(orderId, status) {
+  db.collection("orders").doc(orderId).update({
+    status: status
+  }).then(() => {
+    alert("อัปเดตสถานะแล้ว");
+    loadOrders();
+  });
+}
 </script>
 
-
 </body>
+
 </html>

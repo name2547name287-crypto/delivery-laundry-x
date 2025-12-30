@@ -10,12 +10,24 @@
 <h2>📦 สถานะออเดอร์ของฉัน</h2>
 <div id="orderList">กำลังโหลด...</div>
 
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
 
 <script>
+function statusText(status) {
+  if (status === "wait") return "🕒 รอรับผ้า";
+  if (status === "pickup") return "🚚 กำลังไปรับ";
+  if (status === "washing") return "🧼 กำลังซัก";
+  if (status === "delivering") return "📦 กำลังส่ง";
+  if (status === "done") return "✅ เสร็จสิ้น";
+  return status || "-";
+}
+
 auth.onAuthStateChanged(async user => {
   if (!user) {
     location.href = "login.html";
@@ -30,6 +42,11 @@ auth.onAuthStateChanged(async user => {
   const box = document.getElementById("orderList");
   box.innerHTML = "";
 
+  if (snap.empty) {
+    box.innerHTML = "❌ ยังไม่มีรายการจอง";
+    return;
+  }
+
   snap.forEach(doc => {
     const o = doc.data();
     box.innerHTML += `
@@ -37,7 +54,7 @@ auth.onAuthStateChanged(async user => {
         🧺 ${o.weight} kg<br>
         💰 ${o.price} บาท<br>
         ⏰ ${o.bookingDate} ${o.timeSlot}<br>
-        📌 สถานะ: ${o.status}
+        📌 สถานะ: ${statusText(o.status)}
       </div>
     `;
   });
