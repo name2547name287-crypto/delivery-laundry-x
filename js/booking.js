@@ -147,22 +147,68 @@ function useMyLocation() {
   );
 }
 
-function submitBooking() {
-  const name = document.getElementById("customerName").value.trim();
-  const phone = document.getElementById("customerPhone").value.trim();
-
-  if (!name || !phone) {
-    alert("กรุณากรอกชื่อและเบอร์โทร");
+async function submitBooking() {
+  // 1. เช็ก login
+  const user = auth.currentUser;
+  if (!user) {
+    alert("กรุณาเข้าสู่ระบบ");
     return;
   }
 
+  // 2. เช็กพื้นที่
   if (!isInServiceArea) {
     alert("อยู่นอกพื้นที่ให้บริการ");
     return;
   }
 
-  alert("✅ พร้อมบันทึกการจอง (ขั้นถัดไปคือ Firebase)");
+  // 3. ดึงค่าจากหน้าเว็บ
+  const weight = Number(document.getElementById("weight").value);
+  const timeSlot = document.getElementById("timeSlot").value;
+  const priceText = document.getElementById("price").innerText;
+  const bookingDate = document.getElementById("bookingDate").value;
+
+  if (!bookingDate) {
+    alert("กรุณาเลือกวันที่");
+    return;
+  }
+
+  if (!priceText.includes("บาท")) {
+    alert("กรุณาเลือกจุดรับผ้า");
+    return;
+  }
+
+  // 4. ห้ามจองย้อนหลัง
+  const now = new Date();
+  const selected = new Date(`${bookingDate} ${timeSlot}`);
+  if (selected < now) {
+    alert("ไม่สามารถจองย้อนหลังได้");
+    return;
+  }
+
+  const price = Number(priceText.replace(/[^\d]/g, ""));
+
+  // 5. บันทึก Firebase
+  try {
+    await db.collection("orders").add({
+      userId: user.uid,
+      weight,
+      price,
+      timeSlot,
+      bookingDate,
+      status: "wait",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // 6. ไปหน้าสถานะ
+    window.location.href = "order.html";
+
+  } catch (err) {
+    alert("บันทึกไม่สำเร็จ");
+    console.error(err);
+  }
 }
+
+
 
 function openProfile() {
   alert("กำลังพัฒนา");
