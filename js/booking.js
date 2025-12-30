@@ -200,8 +200,7 @@ const lng = marker.getPosition().lng();
   const price = Number(priceText.replace(/[^\d]/g, ""));
 
   // 5. บันทึก Firebase
-  try {
-   await auth.onAuthStateChanged(async user => {
+auth.onAuthStateChanged(async user => {
   if (!user) return;
 
   const userSnap = await db.collection("users").doc(user.uid).get();
@@ -228,7 +227,8 @@ const lng = marker.getPosition().lng();
 
   location.href = "order.html";
 });
-
+  try {
+ 
 
   } catch (err) {
     alert("บันทึกไม่สำเร็จ");
