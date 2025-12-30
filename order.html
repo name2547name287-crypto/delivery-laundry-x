@@ -61,9 +61,15 @@ auth.onAuthStateChanged(async user => {
       ⏰ ${o.bookingDate} ${o.timeSlot}
     </div>
 
-    <div class="order-status">
-      ${statusText(o.status)}
-    </div>
+    <div style="font-size:12px;opacity:.6;margin-bottom:6px">
+  ORDER
+</div>
+
+    <div class="order-status status-${o.status}">
+  ${statusText(o.status)}
+</div>
+ 
+
   </div>
 `;
   });
