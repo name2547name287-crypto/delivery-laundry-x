@@ -7,30 +7,55 @@
 <link rel="stylesheet" href="css/app.css">
 <link rel="icon" href="data:,">
 <style>
-.order {
-  background: #1e1e1e;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0f0f0f;
   color: #fff;
-  border-radius: 12px;
+  padding: 16px;
+}
+
+h2, h3 {
+  margin-top: 20px;
+}
+
+.order {
+  background: linear-gradient(145deg, #1a1a1a, #121212);
+  border-radius: 16px;
   padding: 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  margin-bottom: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.45);
+}
+
+.order .name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.order .sub {
+  font-size: 13px;
+  opacity: .8;
+}
+
+.order .btns {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .order button {
   border: none;
-  border-radius: 8px;
-  padding: 6px 10px;
-  margin-right: 6px;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
   cursor: pointer;
 }
 
-.order button:first-child {
-  background: #ff9800;
-}
-
-.order button:last-child {
-  background: #4caf50;
-}
+.btn-pickup { background: #2563eb; }
+.btn-wash { background: #059669; }
+.btn-send { background: #d97706; }
+.btn-done { background: #16a34a; }
 
 </style>
 </head>
@@ -54,6 +79,12 @@
 </div>
 
 <div id="adminOrders">กำลังโหลด...</div>
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fTECPU9pSqKwV4bff8VwSxqYEuGsUPI&libraries=geometry&callback=initMap"
+  async
+
+></script>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -99,34 +130,36 @@ async function loadOrders() {
     const o = doc.data();
     total += o.price || 0;
 
-const mapLink = o.lat && o.lng
-  ? `https://www.google.com/maps?q=${o.lat},${o.lng}`
-  : "#";
+const mapLink =
+  typeof o.lat === "number" && typeof o.lng === "number"
+    ? `https://www.google.com/maps/search/?api=1&query=${o.lat},${o.lng}`
+    : null;
+
 
 const html = `
   <div class="order">
-    <div style="font-weight:bold">👤 ${o.username || "-"}</div>
-    <div>📞 ${o.phone || "-"}</div>
-    <div>🧺 ${o.weight} kg</div>
-    <div>💰 ${o.price} บาท</div>
-    <div>📌 สถานะ: ${o.status}</div>
+    <div class="name">👤 ${o.username || "-"}</div>
+    <div class="sub">📞 ${o.phone || "-"}</div>
 
-    <div style="margin-top:6px">
-      📍 
-      <a href="${mapLink}" target="_blank">
-        เปิดแผนที่
-      </a>
+    <div class="sub">🧺 ${o.weight} kg | 💰 ${o.price} บาท</div>
+    <div class="sub">📌 สถานะ: ${o.status}</div>
+
+    <div class="sub" style="margin-top:4px">
+      📍 ${
+        mapLink
+          ? `<a href="${mapLink}" target="_blank">เปิดแผนที่</a>`
+          : "ไม่มีพิกัด"
+      }
     </div>
 
-    <div style="margin-top:10px">
-      <button onclick="updateStatus('${doc.id}','pickup')">🚚 รับผ้า</button>
-      <button onclick="updateStatus('${doc.id}','washing')">🧼 ซักผ้า</button>
-      <button onclick="updateStatus('${doc.id}','delivering')">📦 ส่ง</button>
-      <button onclick="updateStatus('${doc.id}','done')">✅ เสร็จ</button>
+    <div class="btns">
+      <button class="btn-pickup" onclick="updateStatus('${doc.id}','pickup')">รับผ้า</button>
+      <button class="btn-wash" onclick="updateStatus('${doc.id}','washing')">ซัก</button>
+      <button class="btn-send" onclick="updateStatus('${doc.id}','delivering')">ส่ง</button>
+      <button class="btn-done" onclick="updateStatus('${doc.id}','done')">เสร็จ</button>
     </div>
   </div>
-`;
-
+`;    
 
     if (o.status === "done") his.innerHTML += html;
     else cur.innerHTML += html;
