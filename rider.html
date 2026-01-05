@@ -65,7 +65,8 @@ auth.onAuthStateChanged(async user => {
   }
 
   const snap = await db.collection("users").doc(user.uid).get();
-  if (!snap.exists || snap.data().role !== "rider") {
+  if (!snap.exists || snap.data().role !== "rider") 
+   if (!snap.exists || snap.data().role !== "admin"){
     alert("ไม่ใช่ Rider");
     location.href = "index.html";
     return;
