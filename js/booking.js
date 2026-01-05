@@ -175,6 +175,7 @@ function useMyLocation() {
 }
 
 async function submitBooking() {
+  console.log("🔥 submitBooking called");
   const user = auth.currentUser;
   if (!user) return alert("กรุณาเข้าสู่ระบบ");
   if (!isInServiceArea) return alert("อยู่นอกพื้นที่ให้บริการ");
@@ -216,9 +217,10 @@ async function submitBooking() {
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
- const paymentMethod = document.querySelector(
-  'input[name="paymentMethod"]:checked'
-).value;
+const paymentMethod = document.querySelector(
+  'input[name="payment"]:checked'
+).value || "cash";  "transfer";
+
 
   try {
    await db.collection("orders").add({
