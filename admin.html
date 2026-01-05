@@ -150,6 +150,17 @@ const html = `
     <div class="name">👤 ${o.username || "-"}</div>
     <div class="sub">📞 ${o.phone || "-"}</div>
     <div>📝 รายละเอียด: ${o.note || "-"}</div>
+  
+    <div>💳 ${o.paymentMethod}</div>
+    <div>📌 ${o.paymentStatus}</div>
+  
+    ${o.paymentStatus === "paid" ? `
+    <button onclick="confirmPayment('${doc.id}')"
+    style="background:#4caf50;color:#fff">
+    💰 ยืนยันการชำระเงิน
+  </button>
+` : ""}
+
 
 
     <div class="sub">🧺 ${o.weight} kg | 💰 ${o.price} บาท</div>
@@ -200,6 +211,20 @@ async function saveConfig() {
   alert("บันทึกแล้ว");
 }
 // โหลดค่าตั้งต้น
+
+function confirmPayment(orderId) {
+  if (!confirm("ยืนยันว่าได้รับเงินแล้ว?")) return;
+
+  db.collection("orders").doc(orderId).update({
+    paymentStatus: "confirmed"
+  }).then(() => {
+    alert("✅ ยืนยันการชำระเงินแล้ว");
+    loadOrders(); // โหลดใหม่ทันที
+  }).catch(err => {
+    console.error(err);
+    alert("เกิดข้อผิดพลาด");
+  });
+}
 
 </script>
 
