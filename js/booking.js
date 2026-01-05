@@ -216,6 +216,9 @@ async function submitBooking() {
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
+  const paymentMethod =
+  document.querySelector('input[name="payment"]:checked')?.value || "cash";
+  
   try {
    await db.collection("orders").add({
   userId: user.uid,
