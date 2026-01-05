@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rider Dashboard</title>
+
+<style>
+body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: system-ui;
+}
+.header {
+  padding: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  background: #111;
+}
+.order {
+  background: #1e1e1e;
+  margin: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.4);
+}
+.order div {
+  margin-bottom: 6px;
+}
+.btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 6px;
+}
+.pickup { background: #ff9800; }
+.deliver { background: #03a9f4; }
+.done { background: #4caf50; }
+.map {
+  background: #d32f2f;
+  color: #fff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🛵 Rider Dashboard</div>
+<div id="orders">กำลังโหลด...</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+
+<script>
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
+
+  const snap = await db.collection("users").doc(user.uid).get();
+  if (!snap.exists || snap.data().role !== "rider") {
+    alert("ไม่ใช่ Rider");
+    location.href = "index.html";
+    return;
+  }
+
+  loadOrders();
+});
+
+async function loadOrders() {
+  const snap = await db.collection("orders")
+    .where("status", "in", ["wait","pickup","delivering"])
+    .orderBy("createdAt","asc")
+    .get();
+
+  const box = document.getElementById("orders");
+  box.innerHTML = "";
+
+  if (snap.empty) {
+    box.innerHTML = "📭 ไม่มีงานตอนนี้";
+    return;
+  }
+
+  snap.forEach(doc => {
+    const o = doc.data();
+
+    const mapLink = o.lat
+      ? `https://www.google.com/maps?q=${o.lat},${o.lng}`
+      : "#";
+
+    box.innerHTML += `
+      <div class="order">
+        <div>👤 ${o.username}</div>
+        <div>📞 <a href="tel:${o.phone}" style="color:#4caf50">${o.phone}</a></div>
+        <div>📌 สถานะ: ${o.status}</div>
+
+        <button class="btn map" onclick="openMap('${mapLink}')">📍 แผนที่</button>
+        <button class="btn pickup" onclick="update('${doc.id}','pickup')">รับผ้า</button>
+        <button class="btn deliver" onclick="update('${doc.id}','delivering')">ส่ง</button>
+        <button class="btn done" onclick="update('${doc.id}','done')">เสร็จ</button>
+      </div>
+    `;
+  });
+}
+
+function openMap(url) {
+  window.open(url, "_blank");
+}
+
+function update(id, status) {
+  db.collection("orders").doc(id).update({ status })
+    .then(loadOrders);
+}
+</script>
+
+</body>
+</html>
