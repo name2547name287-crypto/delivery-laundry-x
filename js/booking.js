@@ -216,9 +216,10 @@ async function submitBooking() {
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
-  const paymentMethod =
-  document.querySelector('input[name="payment"]:checked')?.value || "cash";
-  
+ const paymentMethod = document.querySelector(
+  'input[name="paymentMethod"]:checked'
+).value;
+
   try {
    await db.collection("orders").add({
   userId: user.uid,
@@ -239,8 +240,10 @@ async function submitBooking() {
   status: "wait",
 
   // ⭐ payment
-  paymentMethod: "cash",   // cash | transfer
-  paymentStatus: "unpaid", // unpaid | paid
+paymentMethod: paymentMethod,
+paymentStatus: paymentMethod === "cash" ? "unpaid" : "paid",
+
+
 
   createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });

@@ -77,6 +77,35 @@ h2 {
   color: #4ade80;
 }
 
+
+.order-card {
+  background: #111;
+  color: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+
+.order-row {
+  margin-bottom: 6px;
+}
+
+.order-price {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.order-status {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.order-pay {
+  margin-top: 4px;
+  color: #ffc107;
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;
