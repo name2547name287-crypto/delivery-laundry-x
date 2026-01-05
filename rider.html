@@ -98,15 +98,21 @@ async function loadOrders() {
 
     box.innerHTML += `
       <div class="order">
-        <div>👤 ${o.username}</div>
-        <div>📞 <a href="tel:${o.phone}" style="color:#4caf50">${o.phone}</a></div>
-        <div>📌 สถานะ: ${o.status}</div>
+    <div class="name">👤 ${o.username || "-"}</div>
+    <div class="sub">📞 ${o.phone || "-"}</div>
+    <div>📝 รายละเอียด: ${o.note || "-"}</div>
 
-        <button class="btn map" onclick="openMap('${mapLink}')">📍 แผนที่</button>
-        <button class="btn pickup" onclick="update('${doc.id}','pickup')">รับผ้า</button>
-        <button class="btn deliver" onclick="update('${doc.id}','delivering')">ส่ง</button>
-        <button class="btn done" onclick="update('${doc.id}','done')">เสร็จ</button>
-      </div>
+
+    <div class="sub">🧺 ${o.weight} kg | 💰 ${o.price} บาท</div>
+    <div class="sub">📌 สถานะ: ${o.status}</div>
+
+    <div class="sub" style="margin-top:4px">
+      📍 ${
+        mapLink
+          ? `<a href="${mapLink}" target="_blank">เปิดแผนที่</a>`
+          : "ไม่มีพิกัด"
+      }
+    </div>
     `;
   });
 }
