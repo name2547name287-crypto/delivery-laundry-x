@@ -179,8 +179,25 @@ async function submitBooking() {
   if (!user) return alert("กรุณาเข้าสู่ระบบ");
   if (!isInServiceArea) return alert("อยู่นอกพื้นที่ให้บริการ");
 
-  const customerName = document.getElementById("customerName").value;
-  const customerPhone = document.getElementById("customerPhone").value;
+ // 🔹 ดึงข้อมูล user จาก Firestore
+  const userSnap = await db.collection("users").doc(user.uid).get();
+  if (!userSnap.exists) {
+    alert("ไม่พบข้อมูลผู้ใช้");
+    return;
+  }
+
+  const u = userSnap.data();
+
+  // ❗ ถ้ายังไม่กรอก profile
+  if (!u.username || !u.phone) {
+    alert("กรุณากรอกชื่อและเบอร์ในโปรไฟล์ก่อนใช้งาน");
+    location.href = "profile.html";
+    return;
+  }
+
+  // ===== ใช้ข้อมูลจาก profile =====
+  const customerName = u.username;
+  const customerPhone = u.phone;
   const customerNote = document.getElementById("customerNote").value || "";
 
   const bookingDate = document.getElementById("bookingDate").value;
@@ -221,3 +238,5 @@ async function submitBooking() {
     alert("บันทึกไม่สำเร็จ");
   }
 }
+
+
