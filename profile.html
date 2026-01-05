@@ -1,29 +1,90 @@
- <h2>ข้อมูลลูกค้า</h2>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โปรไฟล์ของฉัน</title>
 
-<input id="phone" placeholder="เบอร์โทร">
-<input id="address" placeholder="ที่อยู่รับผ้า">
+<style>
+body {
+  font-family: sans-serif;
+  background: #111;
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+}
+.box {
+  background: #1e1e1e;
+  padding: 16px;
+  border-radius: 12px;
+  max-width: 400px;
+  margin: auto;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: none;
+}
+button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #d32f2f;
+  color: #fff;
+  font-weight: bold;
+}
+</style>
+</head>
 
-<button onclick="saveProfile()">บันทึก</button>
+<body>
 
+<h2>👤 โปรไฟล์ของฉัน</h2>
+
+<div class="box">
+  <input id="username" placeholder="ชื่อผู้ใช้">
+  <input id="phone" placeholder="เบอร์โทร">
+  <button onclick="saveProfile()">💾 บันทึกข้อมูล</button>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="js/firebase.js"></script>
+
 <script>
 auth.onAuthStateChanged(async user => {
-  if (!user) location.href = "login.html";
+  if (!user) {
+    location.href = "login.html";
+    return;
+  }
 
-  const doc = await db.collection("users").doc(user.uid).get();
-  if (doc.exists) {
-    phone.value = doc.data().phone || "";
-    address.value = doc.data().address || "";
+  const snap = await db.collection("users").doc(user.uid).get();
+  if (snap.exists) {
+    const u = snap.data();
+    document.getElementById("username").value = u.username || "";
+    document.getElementById("phone").value = u.phone || "";
   }
 });
 
-function saveProfile() {
-  auth.currentUser && db.collection("users")
-    .doc(auth.currentUser.uid)
-    .update({
-      phone: phone.value,
-      address: address.value
-    })
-    .then(() => alert("บันทึกเรียบร้อย"));
+async function saveProfile() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const username = document.getElementById("username").value;
+  const phone = document.getElementById("phone").value;
+
+  await db.collection("users").doc(user.uid).update({
+    username,
+    phone
+  });
+
+  alert("✅ บันทึกเรียบร้อย");
 }
 </script>
+
+</body>
+</html>
