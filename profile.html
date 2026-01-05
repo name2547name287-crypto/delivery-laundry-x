@@ -6,47 +6,115 @@
 <title>โปรไฟล์ของฉัน</title>
 
 <style>
-body {
-  font-family: sans-serif;
-  background: #111;
-  color: #fff;
-  margin: 0;
-  padding: 20px;
+* {
+  box-sizing: border-box;
 }
-.box {
-  background: #1e1e1e;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #000, #1a1a1a);
+  color: #fff;
+}
+
+/* ===== HEADER ===== */
+.header {
   padding: 16px;
-  border-radius: 12px;
-  max-width: 400px;
-  margin: auto;
+  font-size: 18px;
+  font-weight: bold;
+  background: #111;
+  border-bottom: 1px solid #222;
+}
+
+/* ===== CARD ===== */
+.card {
+  max-width: 420px;
+  margin: 20px auto;
+  background: #1e1e1e;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* ===== AVATAR ===== */
+.avatar {
+  width: 80px;
+  height: 80px;
+  background: #d32f2f;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* ===== FORM ===== */
+label {
+  font-size: 14px;
+  opacity: 0.8;
 }
 input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  margin: 6px 0 14px;
+  border-radius: 10px;
   border: none;
+  background: #111;
+  color: #fff;
+  font-size: 16px;
 }
+
+/* ===== BUTTON ===== */
 button {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 14px;
+  border-radius: 12px;
   border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-save {
   background: #d32f2f;
   color: #fff;
-  font-weight: bold;
+}
+.btn-back {
+  background: transparent;
+  color: #aaa;
+  margin-top: 10px;
+  border: 1px solid #333;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 20px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>👤 โปรไฟล์ของฉัน</h2>
+<div class="header">👤 โปรไฟล์ของฉัน</div>
 
-<div class="box">
+<div class="card">
+  <div class="avatar" id="avatar">?</div>
+
+  <label>ชื่อผู้ใช้</label>
   <input id="username" placeholder="ชื่อผู้ใช้">
+
+  <label>เบอร์โทร</label>
   <input id="phone" placeholder="เบอร์โทร">
-  <button onclick="saveProfile()">💾 บันทึกข้อมูล</button>
+
+  <button class="btn-save" onclick="saveProfile()">💾 บันทึกข้อมูล</button>
+  <button class="btn-back" onclick="location.href='index.html'">← กลับหน้าหลัก</button>
+</div>
+
+<div class="footer">
+  Delivery Laundry X
 </div>
 
 <!-- Firebase -->
@@ -67,6 +135,12 @@ auth.onAuthStateChanged(async user => {
     const u = snap.data();
     document.getElementById("username").value = u.username || "";
     document.getElementById("phone").value = u.phone || "";
+
+    // Avatar ตัวอักษรแรก
+    if (u.username) {
+      document.getElementById("avatar").innerText =
+        u.username.charAt(0).toUpperCase();
+    }
   }
 });
 
@@ -74,8 +148,13 @@ async function saveProfile() {
   const user = auth.currentUser;
   if (!user) return;
 
-  const username = document.getElementById("username").value;
-  const phone = document.getElementById("phone").value;
+  const username = document.getElementById("username").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if (!username || !phone) {
+    alert("กรุณากรอกข้อมูลให้ครบ");
+    return;
+  }
 
   await db.collection("users").doc(user.uid).update({
     username,
