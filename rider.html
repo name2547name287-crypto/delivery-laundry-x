@@ -113,6 +113,13 @@ async function loadOrders() {
           : "ไม่มีพิกัด"
       }
     </div>
+     <div class="btns">
+      <button class="btn-pickup" onclick="updateStatus('${doc.id}','pickup')">🚚 รับผ้าแล้ว</button>
+      <button class="btn-wash" onclick="updateStatus('${doc.id}','washing')">🧼 ซัก</button>
+      <button class="btn-send" onclick="updateStatus('${doc.id}','delivering')">📦 ส่ง</button>
+      <button class="btn-done" onclick="updateStatus('${doc.id}','done')">✅ เสร็จสิ้น</button>
+    </div>
+  </div>
     `;
   });
 }

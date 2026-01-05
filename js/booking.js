@@ -217,20 +217,31 @@ async function submitBooking() {
   const lng = marker.getPosition().lng();
 
   try {
-    await db.collection("orders").add({
-      userId: user.uid,
-      username: customerName,
-      phone: customerPhone,
-      note: customerNote,
-      lat,
-      lng,
-      weight,
-      price,
-      bookingDate,
-      timeSlot,
-      status: "wait",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+   await db.collection("orders").add({
+  userId: user.uid,
+
+  username: customerName,
+  phone: customerPhone,
+  note: customerNote || "",
+
+  lat: lat,
+  lng: lng,
+
+  weight,
+  price,
+
+  bookingDate,
+  timeSlot,
+
+  status: "wait",
+
+  // ⭐ payment
+  paymentMethod: "cash",   // cash | transfer
+  paymentStatus: "unpaid", // unpaid | paid
+
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+
 
     location.href = "order.html";
   } catch (e) {
