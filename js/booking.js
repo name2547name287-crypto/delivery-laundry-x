@@ -251,7 +251,7 @@ paymentStatus: paymentMethod === "cash" ? "unpaid" : "paid",
 });
 
 
-    location.href = "order.html";
+  location.href = "payment.html?id=" + ref.id;
   } catch (e) {
     console.error(e);
     alert("บันทึกไม่สำเร็จ");

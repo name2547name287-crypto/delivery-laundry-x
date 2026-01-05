@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ชำระเงิน</title>
+<link rel="stylesheet" href="css/payment.css">
+</head>
+<body>
+
+<h2>💳 ชำระเงิน</h2>
+
+<div id="orderBox">กำลังโหลด...</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+
+<script>
+const orderId = new URLSearchParams(location.search).get("id");
+
+async function loadPayment() {
+  const orderSnap = await db.collection("orders").doc(orderId).get();
+  const cfgSnap = await db.collection("config").doc("app").get();
+
+  const o = orderSnap.data();
+  const cfg = cfgSnap.data();
+
+  document.getElementById("orderBox").innerHTML = `
+    <div class="card">
+      <h3>ยอดที่ต้องชำระ</h3>
+      <div class="price">${o.price} บาท</div>
+
+      <img src="${cfg.qrImageUrl}" class="qr">
+
+      <div class="bank">
+        <div>${cfg.bankName}</div>
+        <div>${cfg.accountName}</div>
+        <div>${cfg.bankAccount}</div>
+        <div>PromptPay: ${cfg.promptpay}</div>
+      </div>
+
+      <div class="status">
+        สถานะ: ${o.paymentStatus === "unpaid" ? "⏳ รอชำระเงิน" : "✅ ชำระแล้ว"}
+      </div>
+
+      <button onclick="markPaid()">ฉันโอนแล้ว</button>
+    </div>
+  `;
+}
+
+async function markPaid() {
+  await db.collection("orders").doc(orderId).update({
+    paymentStatus: "paid"
+  });
+  alert("แจ้งชำระเงินแล้ว รอแอดมินตรวจสอบ");
+  location.href = "order.html";
+}
+
+loadPayment();
+</script>
+
+</body>
+</html>
