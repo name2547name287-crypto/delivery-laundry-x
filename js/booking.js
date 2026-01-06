@@ -223,15 +223,14 @@ const paymentMethod = document.querySelector(
 
 
   try {
-   await db.collection("orders").add({
+ const ref = await db.collection("orders").add({
   userId: user.uid,
-
   username: customerName,
   phone: customerPhone,
   note: customerNote || "",
 
-  lat: lat,
-  lng: lng,
+  lat,
+  lng,
 
   weight,
   price,
@@ -239,23 +238,20 @@ const paymentMethod = document.querySelector(
   bookingDate,
   timeSlot,
 
+  paymentMethod: paymentMethod,   // cash | transfer
+  paymentStatus: "pending",        // ⭐ เพิ่มไว้เลย
+
   status: "wait",
-
-  // ⭐ payment
-paymentMethod: paymentMethod,
-paymentStatus: paymentMethod === "cash" ? "unpaid" : "paid",
-
-
-
   createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
 
 
+
   location.href = "payment.html?id=" + ref.id;
-  } catch (e) {
+  
+}   catch (e) {
     console.error(e);
     alert("บันทึกไม่สำเร็จ");
   }
 }
-
 
