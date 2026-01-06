@@ -254,4 +254,15 @@ const paymentMethod = document.querySelector(
     alert("บันทึกไม่สำเร็จ");
   }
 }
+let selectedPayment = "cash";
+function selectPayment(type) {
+  selectedPayment = type;
+
+  document.querySelectorAll(".payment-option").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  document.getElementById("pay-" + type).classList.add("active");
+}
+
 
