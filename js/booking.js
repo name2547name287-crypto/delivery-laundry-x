@@ -238,8 +238,10 @@ const paymentMethod = document.querySelector(
   bookingDate,
   timeSlot,
 
-  paymentMethod: paymentMethod,   // cash | transfer
-  paymentStatus: "pending",        // ⭐ เพิ่มไว้เลย
+ paymentMethod: selectedPayment,
+paymentStatus: selectedPayment === "cash"
+  ? "pay_on_delivery"
+  : "waiting_transfer",
 
   status: "wait",
   createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -254,15 +256,18 @@ const paymentMethod = document.querySelector(
     alert("บันทึกไม่สำเร็จ");
   }
 }
+
 let selectedPayment = "cash";
+
 function selectPayment(type) {
   selectedPayment = type;
 
-  document.querySelectorAll(".payment-option").forEach(el => {
-    el.classList.remove("active");
+  document.querySelectorAll(".payment-card").forEach(card => {
+    card.classList.remove("active");
   });
 
-  document.getElementById("pay-" + type).classList.add("active");
+  event.currentTarget.classList.add("active");
 }
+
 
 
