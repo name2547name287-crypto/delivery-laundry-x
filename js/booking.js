@@ -217,10 +217,7 @@ async function submitBooking() {
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
-const paymentMethod = document.querySelector(
-  'input[name="payment"]:checked'
-).value || "cash";  "transfer";
-
+const paymentMethod = selectedPayment;
 
   try {
  const ref = await db.collection("orders").add({
@@ -260,14 +257,34 @@ paymentStatus: selectedPayment === "cash"
 let selectedPayment = "cash";
 
 function selectPayment(type) {
+  // 1. จำค่าที่เลือก
   selectedPayment = type;
 
-  document.querySelectorAll(".payment-card").forEach(card => {
-    card.classList.remove("active");
-  });
+  // 2. ลบ active ทุกใบ
+  document.querySelectorAll(".payment-card")
+    .forEach(card => card.classList.remove("active"));
 
-  event.currentTarget.classList.add("active");
+  // 3. ใส่ active ใบที่กด
+  document
+    .querySelector(`.payment-card input[value="${type}"]`)
+    .closest(".payment-card")
+    .classList.add("active");
+
+  console.log("💳 payment =", selectedPayment);
 }
 
+const ref = await db.collection("orders").add({
+  userId: user.uid,
 
+  paymentMethod: paymentMethod,
+  paymentStatus: paymentMethod === "cash" ? "cod" : "unpaid",
 
+  status: "wait",
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+
+if (paymentMethod === "transfer") {
+  location.href = "payment.html?id=" + ref.id;
+} else {
+  location.href = "order.html";
+}
