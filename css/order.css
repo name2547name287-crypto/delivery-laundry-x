@@ -120,9 +120,9 @@ h2 {
 .order-topbar {
   position: sticky;
   top: 0;
-  background: #000000;
+  background: #0f0f0f;
   padding: 12px;
-  border-bottom: 1px solid #000000;
+  border-bottom: 1px solid #0f0f0f;
   z-index: 100;
 }
 
