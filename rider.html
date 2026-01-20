@@ -121,7 +121,28 @@ async function loadOrders() {
     </div>
   </div>
     `;
+       if (o.status === "done") his.innerHTML += html;
+    else cur.innerHTML += html;
+
+    box.innerHTML += html;
   });
+
+  document.getElementById("totalIncome").innerText = total;
+}
+
+// 🔁 เปลี่ยนสถานะออเดอร์
+function updateStatus(orderId, status) {
+  db.collection("orders").doc(orderId).update({
+    status: status
+  }).then(() => {
+    alert("อัปเดตสถานะแล้ว");
+    loadOrders();
+  });
+}
+ 
+function initMap() {
+  console.log("Map initialized");
+  // You can add map initialization code here if needed});
 }
 
 function openMap(url) {
