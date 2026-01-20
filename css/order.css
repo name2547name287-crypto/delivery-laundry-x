@@ -120,15 +120,15 @@ h2 {
 .order-topbar {
   position: sticky;
   top: 0;
-  background: #fff;
+  background: #000000;
   padding: 12px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #000000;
   z-index: 100;
 }
 
 .back-home {
   background: #d32f2f;
-  color: #fff;
+  color: #000000;
   border: none;
   padding: 10px 14px;
   border-radius: 10px;
