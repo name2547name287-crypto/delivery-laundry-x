@@ -106,7 +106,6 @@ h2, h3 {
   <div>💰 รายได้รวม: <span id="totalIncome">0</span> บาท</div>
 </div>
 
-
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fTECPU9pSqKwV4bff8VwSxqYEuGsUPI&libraries=geometry&callback=initMap"
   async
@@ -176,7 +175,17 @@ function getTimeGroup(timeSlot) {
   return "🌙 รอบดึก";
 }
 
-function renderOrderCard(order) {
+try {
+  box.innerHTML += renderOrderCard(order);
+} catch (e) {
+  console.error("Render error", e, order);
+  
+  console.log("PAYMENT CHECK", {
+  id: order.id,
+  method: order.paymentMethod,
+  status: order.paymentStatus
+});
+
   const mapLink =
     typeof order.lat === "number"
       ? `https://www.google.com/maps?q=${order.lat},${order.lng}`
@@ -207,14 +216,16 @@ function renderOrderCard(order) {
           : "ไม่มีพิกัด"
       }
 
- ${order.paymentMethod === "transfer" &&
- (order.paymentStatus === "waiting_transfer" || order.paymentStatus === "unpaid")
+ ${order.paymentMethod &&
+ order.paymentMethod !== "cash" &&
+ order.paymentStatus !== "confirmed"
   ? `<button onclick="confirmPayment('${order.id}')"
       style="margin-top:8px;background:#22c55e;color:#fff">
       💰 ยืนยันการรับเงิน
     </button>`
   : ""
 }
+
 
 
 
@@ -330,6 +341,14 @@ loadHistoryOrders();
 
 
 </script>
+
+<script>
+function initMap() {
+  console.log("Google Map loaded");
+}
+
+</script>
+
 
 </body>
 

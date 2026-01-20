@@ -126,7 +126,7 @@ function renderOrderCard(order) {
 
       <div>💳 ${order.paymentMethod}</div>
       <div>📌 ${order.paymentStatus}</div>
-
+ <div class="order-pay">💳 ${payText(order.paymentStatus)}</div>
 
 
       <div class="sub">
@@ -156,18 +156,26 @@ function renderOrderCard(order) {
   `;
 }
 
-function groupByTimeSlot(orders) {
+function groupByDateAndTime(orders) {
   const groups = {};
+
   orders.forEach(o => {
-    const key = o.timeSlot || "ไม่ระบุรอบ";
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(o);
+    const date = o.bookingDate || "ไม่ระบุวัน";
+    const time = o.timeSlot || "ไม่ระบุรอบ";
+
+    if (!groups[date]) groups[date] = {};
+    if (!groups[date][time]) groups[date][time] = [];
+
+    groups[date][time].push(o);
   });
+
   return groups;
 }
 
+
 function loadActiveOrders() {
   db.collection("orders")
+    .orderBy("bookingDate")
     .orderBy("timeSlot")
     .orderBy("createdAt", "asc")
     .onSnapshot(snapshot => {
@@ -178,56 +186,62 @@ function loadActiveOrders() {
 
       snapshot.forEach(doc => {
         const data = doc.data();
-
-        // ❗ กรองสถานะ done ออกตรงนี้
         if (data.status !== "done") {
           orders.push({ id: doc.id, ...data });
         }
       });
 
-      const grouped = groupByTimeSlot(orders);
+      const grouped = groupByDateAndTime(orders);
 
-      Object.keys(grouped).forEach(time => {
+      Object.keys(grouped).forEach(date => {
         box.innerHTML += `
-          <h3 style="margin-top:16px">
-            ⏰ รอบ ${time}
-          </h3>
+          <h2 style="margin-top:24px">📅 ${date}</h2>
         `;
 
-        grouped[time].forEach(order => {
-          box.innerHTML += renderOrderCard(order);
+        Object.keys(grouped[date]).forEach(time => {
+          box.innerHTML += `
+            <h3 style="margin-left:12px">⏰ รอบ ${time}</h3>
+          `;
+
+          grouped[date][time].forEach(order => {
+            box.innerHTML += renderOrderCard(order);
+          });
         });
       });
     });
 }
-
-
-
-
+   
+ 
 function loadHistoryOrders() {
   db.collection("orders")
     .where("status", "==", "done")
-    .orderBy("createdAt", "desc")
+    .orderBy("bookingDate", "desc")
+    .orderBy("timeSlot")
     .onSnapshot(snapshot => {
       const box = document.getElementById("historyOrders");
       box.innerHTML = "";
 
+      const orders = [];
       snapshot.forEach(doc => {
-        box.innerHTML += renderOrderCard({
-          id: doc.id,
-          ...doc.data()
+        orders.push({ id: doc.id, ...doc.data() });
+      });
+
+      const grouped = groupByDateAndTime(orders);
+
+      Object.keys(grouped).forEach(date => {
+        box.innerHTML += `<h3>📅 ${date}</h3>`;
+
+        Object.keys(grouped[date]).forEach(time => {
+          box.innerHTML += `<div style="opacity:.7">⏰ ${time}</div>`;
+
+          grouped[date][time].forEach(order => {
+            box.innerHTML += renderOrderCard(order);
+          });
         });
       });
     });
 }
 
-function setStatus(orderId, newStatus) {
-  db.collection("orders")
-    .doc(orderId)
-    .update({
-      status: newStatus
-    });
-}
 
 loadActiveOrders();
 loadHistoryOrders();
