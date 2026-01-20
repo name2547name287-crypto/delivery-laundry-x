@@ -57,6 +57,22 @@ h2, h3 {
 .btn-send { background: #d97706; }
 .btn-done { background: #16a34a; }
 
+.order-card {
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+}
+
+.order-card button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #d32f2f;
+  color: #fff;
+}
+
 </style>
 </head>
 
@@ -73,11 +89,14 @@ h2, h3 {
 <button onclick="saveConfig()">💾 บันทึก</button>
 
 
-<h3>📦 ออเดอร์ปัจจุบัน</h3>
-<div id="currentOrders"></div>
+<h2>📦 ออเดอร์ปัจจุบัน</h2>
+<div id="activeOrders"></div>
 
-<h3>📁 ประวัติออเดอร์</h3>
+<hr>
+
+<h2>📜 ประวัติออเดอร์</h2>
 <div id="historyOrders"></div>
+
 
 
 <h3>📈 สถิติ</h3 >
@@ -226,8 +245,90 @@ function confirmPayment(orderId) {
   });
 }
 
+function getTimeGroup(timeSlot) {
+  if (!timeSlot) return "ไม่ระบุรอบ";
+
+  const h = parseInt(timeSlot.split(":")[0]);
+  if (h >= 6 && h < 12) return "☀️ รอบเช้า";
+  if (h >= 12 && h < 18) return "🌤 รอบบ่าย";
+  return "🌙 รอบดึก";
+}
+
+function renderOrderCard(order, isAdmin = true) {
+  return `
+    <div class="order-card">
+      <strong>${order.username}</strong><br>
+      📞 ${order.phone}<br>
+      📅 ${order.bookingDate} (${getTimeGroup(order.timeSlot)})<br>
+      ⏰ ${order.timeSlot}<br>
+      💰 ${order.price} บาท<br>
+
+      <a target="_blank"
+         href="https://www.google.com/maps?q=${order.lat},${order.lng}">
+         📍 เปิดแผนที่
+      </a>
+
+      <div style="margin-top:8px">
+        ${
+          isAdmin
+            ? `<button onclick="setStatus('${order.id}','done')">✅ เสร็จงาน</button>`
+            : `<button onclick="setStatus('${order.id}','picked')">📦 รับผ้า</button>`
+        }
+      </div>
+    </div>
+  `;
+}
+
+function loadActiveOrders() {
+  db.collection("orders")
+    .where("status", "!=", "done")
+    .orderBy("status")
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+      const box = document.getElementById("activeOrders");
+      box.innerHTML = "";
+
+      snapshot.forEach(doc => {
+        box.innerHTML += renderOrderCard({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+    });
+}
+
+function loadHistoryOrders() {
+  db.collection("orders")
+    .where("status", "==", "done")
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+      const box = document.getElementById("historyOrders");
+      box.innerHTML = "";
+
+      snapshot.forEach(doc => {
+        box.innerHTML += renderOrderCard({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+    });
+}
+
+function setStatus(orderId, newStatus) {
+  db.collection("orders")
+    .doc(orderId)
+    .update({
+      status: newStatus
+    });
+}
+
+loadActiveOrders();
+loadHistoryOrders();
+
+
 </script>
 
 </body>
 
 </html>
+
