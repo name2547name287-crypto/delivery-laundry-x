@@ -106,11 +106,6 @@ h2, h3 {
   <div>💰 รายได้รวม: <span id="totalIncome">0</span> บาท</div>
 </div>
 
-<script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fTECPU9pSqKwV4bff8VwSxqYEuGsUPI&libraries=geometry&callback=initMap"
-  async
-
-></script>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -175,16 +170,12 @@ function getTimeGroup(timeSlot) {
   return "🌙 รอบดึก";
 }
 
-try {
-  box.innerHTML += renderOrderCard(order);
-} catch (e) {
-  console.error("Render error", e, order);
-  
+function renderOrderCard(order) {
   console.log("PAYMENT CHECK", {
-  id: order.id,
-  method: order.paymentMethod,
-  status: order.paymentStatus
-});
+    id: order.id,
+    method: order.paymentMethod,
+    status: order.paymentStatus
+  });
 
   const mapLink =
     typeof order.lat === "number"
@@ -197,39 +188,37 @@ try {
       <div class="sub">📞 ${order.phone || "-"}</div>
       <div>📝 ${order.note || "-"}</div>
 
-      <div>💳 ${order.paymentMethod}</div>
-      <div>📌 ${order.paymentStatus}</div>
-
-
+      <div>💳 ${order.paymentMethod || "-"}</div>
+      <div>📌 ${order.paymentStatus || "-"}</div>
 
       <div class="sub">
-        📅 ${order.bookingDate} | ⏰ ${order.timeSlot}
+        📅 ${order.bookingDate || "-"} | ⏰ ${order.timeSlot || "-"}
       </div>
 
       <div class="sub">
-        🧺 ${order.weight} kg | 💰 ${order.price} บาท
+        🧺 ${order.weight || 0} kg | 💰 ${order.price || 0} บาท
       </div>
+
       <div class="sub">📌 สถานะ: ${order.status}</div>
+
       ${
         mapLink
           ? `<a href="${mapLink}" target="_blank">📍 เปิดแผนที่</a>`
-          : "ไม่มีพิกัด"
+          : ""
       }
 
- ${order.paymentMethod &&
- order.paymentMethod !== "cash" &&
- order.paymentStatus !== "confirmed"
-  ? `<button onclick="confirmPayment('${order.id}')"
-      style="margin-top:8px;background:#22c55e;color:#fff">
-      💰 ยืนยันการรับเงิน
-    </button>`
-  : ""
-}
+      ${
+        order.paymentMethod &&
+        order.paymentMethod !== "cash" &&
+        order.paymentStatus !== "confirmed"
+          ? `<button onclick="confirmPayment('${order.id}')"
+              style="margin-top:8px;background:#22c55e;color:#fff">
+              💰 ยืนยันการรับเงิน
+            </button>`
+          : ""
+      }
 
-
-
-
-  <div class="btns">
+      <div class="btns">
         <button class="btn-pickup" onclick="updateStatus('${order.id}','pickup')">🚚 รับผ้า</button>
         <button class="btn-wash" onclick="updateStatus('${order.id}','washing')">🧼 ซัก</button>
         <button class="btn-send" onclick="updateStatus('${order.id}','delivering')">📦 ส่ง</button>
@@ -238,6 +227,7 @@ try {
     </div>
   `;
 }
+
 
 
 function groupByDateAndTime(orders) {
@@ -339,13 +329,6 @@ function setStatus(orderId, newStatus) {
 loadActiveOrders();
 loadHistoryOrders();
 
-
-</script>
-
-<script>
-function initMap() {
-  console.log("Google Map loaded");
-}
 
 </script>
 
