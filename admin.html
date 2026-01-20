@@ -106,7 +106,6 @@ h2, h3 {
   <div>💰 รายได้รวม: <span id="totalIncome">0</span> บาท</div>
 </div>
 
-<div id="adminOrders">กำลังโหลด...</div>
 
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1fTECPU9pSqKwV4bff8VwSxqYEuGsUPI&libraries=geometry&callback=initMap"
@@ -135,81 +134,8 @@ auth.onAuthStateChanged(async user => {
     return;
   }
 
-  loadOrders();
 });
 
-async function loadOrders() {
-  const snap = await db.collection("orders")
-    .orderBy("createdAt", "desc")
-    .get();
-
-  const cur = document.getElementById("currentOrders");
-  const his = document.getElementById("historyOrders");
-  const box = document.getElementById("adminOrders");
-
-  cur.innerHTML = "";
-  his.innerHTML = "";
-  box.innerHTML = "";
-
-  let total = 0;
-  document.getElementById("totalOrder").innerText = snap.size;
-
-  snap.forEach(doc => {
-    const o = doc.data();
-    total += o.price || 0;
-
-const mapLink =
-  typeof o.lat === "number" && typeof o.lng === "number"
-    ? `https://www.google.com/maps/search/?api=1&query=${o.lat},${o.lng}`
-    : null;
-
-
-const html = `
-  <div class="order">
-    <div class="name">👤 ${o.username || "-"}</div>
-    <div class="sub">📞 ${o.phone || "-"}</div>
-    <div>📝 รายละเอียด: ${o.note || "-"}</div>
-  
-    <div>💳 ${o.paymentMethod}</div>
-    <div>📌 ${o.paymentStatus}</div>
-  
-    ${o.paymentStatus === "paid" ? `
-    <button onclick="confirmPayment('${doc.id}')"
-    style="background:#4caf50;color:#fff">
-    💰 ยืนยันการชำระเงิน
-  </button>
-` : ""}
-
-
-
-    <div class="sub">🧺 ${o.weight} kg | 💰 ${o.price} บาท</div>
-    <div class="sub">📌 สถานะ: ${o.status}</div>
-
-    <div class="sub" style="margin-top:4px">
-      📍 ${
-        mapLink
-          ? `<a href="${mapLink}" target="_blank">เปิดแผนที่</a>`
-          : "ไม่มีพิกัด"
-      }
-    </div>
-
-    <div class="btns">
-      <button class="btn-pickup" onclick="updateStatus('${doc.id}','pickup')">🚚 รับผ้าแล้ว</button>
-      <button class="btn-wash" onclick="updateStatus('${doc.id}','washing')">🧼 ซัก</button>
-      <button class="btn-send" onclick="updateStatus('${doc.id}','delivering')">📦 ส่ง</button>
-      <button class="btn-done" onclick="updateStatus('${doc.id}','done')">✅ เสร็จสิ้น</button>
-    </div>
-  </div>
-`;    
-
-    if (o.status === "done") his.innerHTML += html;
-    else cur.innerHTML += html;
-
-    box.innerHTML += html;
-  });
-
-  document.getElementById("totalIncome").innerText = total;
-}
 
 // 🔁 เปลี่ยนสถานะออเดอร์
 function updateStatus(orderId, status) {
@@ -217,7 +143,6 @@ function updateStatus(orderId, status) {
     status: status
   }).then(() => {
     alert("อัปเดตสถานะแล้ว");
-    loadOrders();
   });
 }
 
@@ -238,7 +163,6 @@ function confirmPayment(orderId) {
     paymentStatus: "confirmed"
   }).then(() => {
     alert("✅ ยืนยันการชำระเงินแล้ว");
-    loadOrders(); // โหลดใหม่ทันที
   }).catch(err => {
     console.error(err);
     alert("เกิดข้อผิดพลาด");
@@ -254,30 +178,45 @@ function getTimeGroup(timeSlot) {
   return "🌙 รอบดึก";
 }
 
-function renderOrderCard(order, isAdmin = true) {
+function renderOrderCard(order) {
+  const mapLink =
+    typeof order.lat === "number"
+      ? `https://www.google.com/maps?q=${order.lat},${order.lng}`
+      : null;
+
   return `
-    <div class="order-card">
-      <strong>${order.username}</strong><br>
-      📞 ${order.phone}<br>
-      📅 ${order.bookingDate} (${getTimeGroup(order.timeSlot)})<br>
-      ⏰ ${order.timeSlot}<br>
-      💰 ${order.price} บาท<br>
+    <div class="order">
+      <div class="name">👤 ${order.username || "-"}</div>
+      <div class="sub">📞 ${order.phone || "-"}</div>
+      <div>📝 ${order.note || "-"}</div>
 
-      <a target="_blank"
-         href="https://www.google.com/maps?q=${order.lat},${order.lng}">
-         📍 เปิดแผนที่
-      </a>
+      <div>💳 ${order.paymentMethod}</div>
+      <div>📌 ${order.paymentStatus}</div>
 
-      <div style="margin-top:8px">
-        ${
-          isAdmin
-            ? `<button onclick="setStatus('${order.id}','done')">✅ เสร็จงาน</button>`
-            : `<button onclick="setStatus('${order.id}','picked')">📦 รับผ้า</button>`
-        }
+      <div class="sub">
+        📅 ${order.bookingDate} | ⏰ ${order.timeSlot}
+      </div>
+
+      <div class="sub">
+        🧺 ${order.weight} kg | 💰 ${order.price} บาท
+      </div>
+
+      ${
+        mapLink
+          ? `<a href="${mapLink}" target="_blank">📍 เปิดแผนที่</a>`
+          : "ไม่มีพิกัด"
+      }
+
+      <div class="btns">
+        <button class="btn-pickup" onclick="updateStatus('${order.id}','pickup')">🚚 รับผ้า</button>
+        <button class="btn-wash" onclick="updateStatus('${order.id}','washing')">🧼 ซัก</button>
+        <button class="btn-send" onclick="updateStatus('${order.id}','delivering')">📦 ส่ง</button>
+        <button class="btn-done" onclick="updateStatus('${order.id}','done')">✅ เสร็จ</button>
       </div>
     </div>
   `;
 }
+
 
 function loadActiveOrders() {
   db.collection("orders")
