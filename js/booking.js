@@ -176,11 +176,12 @@ function useMyLocation() {
 
 async function submitBooking() {
   console.log("🔥 submitBooking called");
+
   const user = auth.currentUser;
   if (!user) return alert("กรุณาเข้าสู่ระบบ");
   if (!isInServiceArea) return alert("อยู่นอกพื้นที่ให้บริการ");
 
- // 🔹 ดึงข้อมูล user จาก Firestore
+  // 🔹 ดึงข้อมูล profile
   const userSnap = await db.collection("users").doc(user.uid).get();
   if (!userSnap.exists) {
     alert("ไม่พบข้อมูลผู้ใช้");
@@ -189,102 +190,84 @@ async function submitBooking() {
 
   const u = userSnap.data();
 
-  // ❗ ถ้ายังไม่กรอก profile
   if (!u.username || !u.phone) {
-    alert("กรุณากรอกชื่อและเบอร์ในโปรไฟล์ก่อนใช้งาน");
+    alert("กรุณากรอกชื่อและเบอร์ในโปรไฟล์ก่อน");
     location.href = "profile.html";
     return;
   }
 
-  // ===== ใช้ข้อมูลจาก profile =====
-  const customerName = u.username;
-  const customerPhone = u.phone;
-  const customerNote = document.getElementById("customerNote").value || "";
+  const customerNote =
+    document.getElementById("customerNote")?.value || "";
 
   const bookingDate = document.getElementById("bookingDate").value;
   const timeSlot = document.getElementById("timeSlot").value;
   const weight = Number(document.getElementById("weight").value);
   const priceText = document.getElementById("price").innerText;
 
-  if (!customerName || !customerPhone) return alert("กรุณากรอกชื่อและเบอร์");
   if (!bookingDate) return alert("กรุณาเลือกวันที่");
   if (!priceText.includes("บาท")) return alert("กรุณาเลือกจุดรับผ้า");
 
   const selected = new Date(`${bookingDate} ${timeSlot}`);
-  if (selected < new Date()) return alert("ไม่สามารถจองย้อนหลังได้");
+  if (selected < new Date()) {
+    return alert("ไม่สามารถจองย้อนหลังได้");
+  }
 
   const price = Number(priceText.replace(/[^\d]/g, ""));
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
-const paymentMethod = selectedPayment;
-
   try {
- const ref = await db.collection("orders").add({
-  userId: user.uid,
-  username: customerName,
-  phone: customerPhone,
-  note: customerNote || "",
+    // ✅ บันทึก order แค่ครั้งเดียว
+    const ref = await db.collection("orders").add({
+      userId: user.uid,
+      username: u.username,
+      phone: u.phone,
+      note: customerNote,
 
-  lat,
-  lng,
+      lat,
+      lng,
 
-  weight,
-  price,
+      weight,
+      price,
+      bookingDate,
+      timeSlot,
 
-  bookingDate,
-  timeSlot,
+      paymentMethod: selectedPayment,
+      paymentStatus:
+        selectedPayment === "cash"
+          ? "pay_on_delivery"
+          : "waiting_transfer",
 
- paymentMethod: selectedPayment,
-paymentStatus: selectedPayment === "cash"
-  ? "pay_on_delivery"
-  : "waiting_transfer",
+      status: "wait",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-  status: "wait",
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-});
+    // ✅ แยกเส้นทางชัดเจน
+    if (selectedPayment === "transfer") {
+      location.href = "payment.html?id=" + ref.id;
+    } else {
+      location.href = "order.html";
+    }
 
-
-
-  location.href = "payment.html?id=" + ref.id;
-  
-}   catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
     alert("บันทึกไม่สำเร็จ");
   }
 }
-
+ 
 let selectedPayment = "cash";
 
 function selectPayment(type) {
-  // 1. จำค่าที่เลือก
   selectedPayment = type;
 
-  // 2. ลบ active ทุกใบ
   document.querySelectorAll(".payment-card")
     .forEach(card => card.classList.remove("active"));
 
-  // 3. ใส่ active ใบที่กด
-  document
-    .querySelector(`.payment-card input[value="${type}"]`)
-    .closest(".payment-card")
-    .classList.add("active");
+  const card = document.querySelector(
+    `.payment-card input[value="${type}"]`
+  )?.closest(".payment-card");
+
+  if (card) card.classList.add("active");
 
   console.log("💳 payment =", selectedPayment);
-}
-
-const ref = await db.collection("orders").add({
-  userId: user.uid,
-
-  paymentMethod: paymentMethod,
-  paymentStatus: paymentMethod === "cash" ? "cod" : "unpaid",
-
-  status: "wait",
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-});
-
-if (paymentMethod === "transfer") {
-  location.href = "payment.html?id=" + ref.id;
-} else {
-  location.href = "order.html";
 }
