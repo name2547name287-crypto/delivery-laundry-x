@@ -142,7 +142,7 @@ function renderOrderCard(order) {
       </div>
 
       <div class="sub">📌 สถานะ: ${order.status}</div>
-
+<div class="order-pay">💳 ${payText(order.paymentStatus)}</div>
       ${
         mapLink
           ? `<a href="${mapLink}" target="_blank">📍 เปิดแผนที่</a>`
