@@ -193,6 +193,8 @@ function renderOrderCard(order) {
       <div>💳 ${order.paymentMethod}</div>
       <div>📌 ${order.paymentStatus}</div>
 
+
+
       <div class="sub">
         📅 ${order.bookingDate} | ⏰ ${order.timeSlot}
       </div>
@@ -200,12 +202,20 @@ function renderOrderCard(order) {
       <div class="sub">
         🧺 ${order.weight} kg | 💰 ${order.price} บาท
       </div>
-
+      <div class="sub">📌 สถานะ: ${o.status}</div>
       ${
         mapLink
           ? `<a href="${mapLink}" target="_blank">📍 เปิดแผนที่</a>`
           : "ไม่มีพิกัด"
       }
+
+      ${order.paymentMethod === "transfer" && order.paymentStatus === "waiting_transfer"
+  ? `<button onclick="confirmPayment('${order.id}')"
+      style="margin-top:8px;background:#22c55e;color:#fff">
+      💰 ยืนยันการรับเงิน
+    </button>`
+  : ""
+}
 
       <div class="btns">
         <button class="btn-pickup" onclick="updateStatus('${order.id}','pickup')">🚚 รับผ้า</button>
@@ -217,24 +227,46 @@ function renderOrderCard(order) {
   `;
 }
 
+function groupByTimeSlot(orders) {
+  const groups = {};
+  orders.forEach(o => {
+    const key = o.timeSlot || "ไม่ระบุรอบ";
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(o);
+  });
+  return groups;
+}
 
 function loadActiveOrders() {
   db.collection("orders")
     .where("status", "!=", "done")
-    .orderBy("status")
-    .orderBy("createdAt", "desc")
+    .orderBy("timeSlot")
+    .orderBy("createdAt", "asc")
     .onSnapshot(snapshot => {
       const box = document.getElementById("activeOrders");
       box.innerHTML = "";
 
+      const orders = [];
       snapshot.forEach(doc => {
-        box.innerHTML += renderOrderCard({
-          id: doc.id,
-          ...doc.data()
+        orders.push({ id: doc.id, ...doc.data() });
+      });
+
+      const grouped = groupByTimeSlot(orders);
+
+      Object.keys(grouped).forEach(time => {
+        box.innerHTML += `
+          <h3 style="margin-top:16px">
+            ⏰ รอบ ${time}
+          </h3>
+        `;
+
+        grouped[time].forEach(order => {
+          box.innerHTML += renderOrderCard(order);
         });
       });
     });
 }
+
 
 function loadHistoryOrders() {
   db.collection("orders")
