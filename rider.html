@@ -165,7 +165,13 @@ function update(id, status) {
   db.collection("orders").doc(id).update({ status })
     .then(loadOrders);
 }
+
+loadActiveOrders();
+loadHistoryOrders();
+
+
 </script>
 
 </body>
 </html>
+
