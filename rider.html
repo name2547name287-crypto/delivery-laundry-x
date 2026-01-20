@@ -246,6 +246,12 @@ function loadHistoryOrders() {
     });
 }
 
+function payText(status) {
+  if (status === "unpaid") return "❌ ยังไม่ชำระ";
+  if (status === "paid") return "⏳ รอแอดมินยืนยัน";
+  if (status === "confirmed") return "✅ ชำระแล้ว";
+  return "-";
+}
 
 loadActiveOrders();
 loadHistoryOrders();
