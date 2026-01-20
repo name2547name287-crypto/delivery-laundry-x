@@ -202,14 +202,14 @@ function renderOrderCard(order) {
       <div class="sub">
         🧺 ${order.weight} kg | 💰 ${order.price} บาท
       </div>
-      <div class="sub">📌 สถานะ: ${o.status}</div>
+      <div class="sub">📌 สถานะ: ${order.status}</div>
       ${
         mapLink
           ? `<a href="${mapLink}" target="_blank">📍 เปิดแผนที่</a>`
           : "ไม่มีพิกัด"
       }
 
-      ${order.paymentMethod === "transfer" && order.paymentStatus === "waiting_transfer"
+ ${order.paymentMethod === "transfer" && order.paymentStatus === "waiting_transfer"
   ? `<button onclick="confirmPayment('${order.id}')"
       style="margin-top:8px;background:#22c55e;color:#fff">
       💰 ยืนยันการรับเงิน
@@ -217,7 +217,7 @@ function renderOrderCard(order) {
   : ""
 }
 
-      <div class="btns">
+  <div class="btns">
         <button class="btn-pickup" onclick="updateStatus('${order.id}','pickup')">🚚 รับผ้า</button>
         <button class="btn-wash" onclick="updateStatus('${order.id}','washing')">🧼 ซัก</button>
         <button class="btn-send" onclick="updateStatus('${order.id}','delivering')">📦 ส่ง</button>
@@ -226,6 +226,7 @@ function renderOrderCard(order) {
     </div>
   `;
 }
+
 
 function groupByTimeSlot(orders) {
   const groups = {};
@@ -239,7 +240,6 @@ function groupByTimeSlot(orders) {
 
 function loadActiveOrders() {
   db.collection("orders")
-    .where("status", "!=", "done")
     .orderBy("timeSlot")
     .orderBy("createdAt", "asc")
     .onSnapshot(snapshot => {
@@ -247,8 +247,14 @@ function loadActiveOrders() {
       box.innerHTML = "";
 
       const orders = [];
+
       snapshot.forEach(doc => {
-        orders.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+
+        // ❗ กรองสถานะ done ออกตรงนี้
+        if (data.status !== "done") {
+          orders.push({ id: doc.id, ...data });
+        }
       });
 
       const grouped = groupByTimeSlot(orders);
@@ -266,6 +272,7 @@ function loadActiveOrders() {
       });
     });
 }
+
 
 
 function loadHistoryOrders() {

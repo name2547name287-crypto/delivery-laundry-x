@@ -137,7 +137,7 @@ function renderOrderCard(order) {
       <div class="sub">
         🧺 ${order.weight} kg | 💰 ${order.price} บาท
       </div>
-      <div class="sub">📌 สถานะ: ${o.status}</div>
+      <div class="sub">📌 สถานะ: ${order.status}</div>
       ${
         mapLink
           ? `<a href="${mapLink}" target="_blank">📍 เปิดแผนที่</a>`
@@ -169,7 +169,6 @@ function groupByTimeSlot(orders) {
 
 function loadActiveOrders() {
   db.collection("orders")
-    .where("status", "!=", "done")
     .orderBy("timeSlot")
     .orderBy("createdAt", "asc")
     .onSnapshot(snapshot => {
@@ -177,8 +176,14 @@ function loadActiveOrders() {
       box.innerHTML = "";
 
       const orders = [];
+
       snapshot.forEach(doc => {
-        orders.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+
+        // ❗ กรองสถานะ done ออกตรงนี้
+        if (data.status !== "done") {
+          orders.push({ id: doc.id, ...data });
+        }
       });
 
       const grouped = groupByTimeSlot(orders);
@@ -196,6 +201,8 @@ function loadActiveOrders() {
       });
     });
 }
+
+
 
 
 function loadHistoryOrders() {
