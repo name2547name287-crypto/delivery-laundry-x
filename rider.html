@@ -77,7 +77,7 @@ auth.onAuthStateChanged(async user => {
 
 async function loadOrders() {
   const snap = await db.collection("orders")
-    .where("status", "in", ["wait","pickup","delivering"])
+    .where("status", "in", ["wait","pickup","washing","delivering"])
     .orderBy("createdAt","asc")
     .get();
 
