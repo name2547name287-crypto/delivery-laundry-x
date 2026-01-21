@@ -82,6 +82,37 @@ h2, h3 {
 
 <h3>⚙️ ตั้งค่าระบบ</h3>
 
+<h3>🧺 ราคาซักผ้า (ปรับได้)</h3>
+
+<label>น้ำเย็น</label>
+<input id="washCold" type="number">
+
+<label>น้ำอุ่น</label>
+<input id="washWarm" type="number">
+
+<label>น้ำร้อน</label>
+<input id="washHot" type="number">
+
+<label>เพิ่มเวลา (บาท/รอบ)</label>
+<input id="washExtraMinute" type="number">
+
+<hr>
+
+<label>อบผ้า (เริ่มต้น)</label>
+<input id="dryBase" type="number">
+
+<label>อบเพิ่ม /10 นาที</label>
+<input id="dryPer10" type="number">
+
+<hr>
+
+<label>พับผ้า (บาท/กก.)</label>
+<input id="foldPerKg" type="number">
+
+<button onclick="saveLaundryPricing()">💾 บันทึกราคาซัก</button>
+
+<h3>🚚 ค่าบริการจัดส่ง (ปรับได้)</h3>
+
 <input id="cfgRadius" placeholder="รัศมีบริการ (เมตร)">
 <input id="cfgPrice" placeholder="ราคาต่อกิโล">
 <input id="cfgNight" placeholder="ค่ารอบดึก">
@@ -326,6 +357,43 @@ function setStatus(orderId, newStatus) {
     });
 }
 
+async function loadLaundryPricing() {
+  const snap = await db.collection("pricing").doc("laundry").get();
+  if (!snap.exists) return;
+
+  const p = snap.data();
+
+  washCold.value = p.wash.cold;
+  washWarm.value = p.wash.warm;
+  washHot.value = p.wash.hot;
+
+  washExtraMinute.value = p.washExtraMinutePrice;
+
+  dryBase.value = p.dry.base;
+  dryPer10.value = p.dry.per10min;
+
+  foldPerKg.value = p.foldPerKg;
+}
+
+async function saveLaundryPricing() {
+  await db.collection("pricing").doc("laundry").update({
+    wash: {
+      cold: Number(washCold.value),
+      warm: Number(washWarm.value),
+      hot: Number(washHot.value)
+    },
+    washExtraMinutePrice: Number(washExtraMinute.value),
+    dry: {
+      base: Number(dryBase.value),
+      per10min: Number(dryPer10.value)
+    },
+    foldPerKg: Number(foldPerKg.value)
+  });
+
+  alert("✅ บันทึกราคาซักแล้ว");
+}
+
+loadLaundryPricing();
 loadActiveOrders();
 loadHistoryOrders();
 
