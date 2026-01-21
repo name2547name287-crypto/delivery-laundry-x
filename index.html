@@ -354,7 +354,40 @@ body {
       <strong id="price">-</strong>  
   
     </div>
-  
+ 
+<h3>🧺 ตัวเลือกการซัก</h3>
+
+<select id="washTemp">
+  <option value="cold">น้ำเย็น</option>
+  <option value="warm">น้ำอุ่น</option>
+  <option value="hot">น้ำร้อน</option>
+</select>
+
+<label>
+  ⏱ เพิ่มเวลา
+  <input id="extraMinute" type="number" value="0">
+</label>
+
+<hr>
+
+<label>
+  🔥 อบผ้า (นาที)
+  <input id="dryMinute" type="number" value="0">
+</label>
+
+<hr>
+
+<label>
+  📦 พับผ้า
+  <input type="checkbox" id="folding">
+</label>
+
+<hr>
+
+<div>
+  🧾 ค่าซัก: <span id="washPrice">0</span> บาท
+</div>
+
 
 <h3>📍 เลือกจุดรับผ้า</h3>
 
@@ -472,6 +505,56 @@ auth.onAuthStateChanged(async user => {
     console.error("โหลดชื่อผู้ใช้ไม่สำเร็จ", err);
   }
 });
+
+
+let laundryPricing = null;
+
+async function loadLaundryPricing() {
+  const snap = await db.collection("pricing").doc("laundry").get();
+  if (!snap.exists) {
+    alert("ไม่พบราคาซัก");
+    return;
+  }
+  laundryPricing = snap.data();
+  console.log("🧺 laundry pricing", laundryPricing);
+}
+
+loadLaundryPricing();
+
+function calculateLaundryPrice() {
+  if (!laundryPricing) return 0;
+
+  const weight = Number(document.getElementById("weight").value) || 0;
+
+  // 🔹 ซัก
+  const temp = document.getElementById("washTemp").value;
+  let price = laundryPricing.wash[temp];
+
+  // 🔹 เพิ่มเวลา
+  const extraMin = Number(extraMinute.value);
+  price += extraMin * laundryPricing.washExtraMinutePrice;
+
+  // 🔹 อบ
+  const dryMin = Number(dryMinute.value);
+  if (dryMin > 0) {
+    price += laundryPricing.dry.base;
+    price += Math.floor(dryMin / 10) * laundryPricing.dry.per10min;
+  }
+
+  // 🔹 พับ
+  if (folding.checked) {
+    price += weight * laundryPricing.foldPerKg;
+  }
+
+  document.getElementById("washPrice").innerText = price;
+  return price;
+}
+
+["washTemp", "extraMinute", "dryMinute", "folding", "weight"]
+  .forEach(id => {
+    document.getElementById(id)?.addEventListener("change", calculateLaundryPrice);
+  });
+
 </script>
 
 

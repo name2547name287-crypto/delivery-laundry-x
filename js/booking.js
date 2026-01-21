@@ -52,29 +52,29 @@ function updatePrice() {
     return;
   }
 
-  let price = weight * (APP_CONFIG.pricePerKg || 2);
+  // 🚚 ค่าส่ง
+  let deliveryPrice = weight * (APP_CONFIG.pricePerKg || 2);
 
-if (NIGHT_SLOTS.includes(timeSlot)) {
-  price += APP_CONFIG.nightFee || 10;
-}
+  if (NIGHT_SLOTS.includes(timeSlot)) {
+    deliveryPrice += APP_CONFIG.nightFee || 10;
+  }
 
-
-  if (currentDistance <= 500) price += 20;
-  else if (currentDistance <= 750) price += 30;
+  if (currentDistance <= 500) deliveryPrice += 20;
+  else if (currentDistance <= 750) deliveryPrice += 30;
   else {
     priceEl.innerText = "❌ นอกพื้นที่ให้บริการ";
     return;
   }
 
- if (NIGHT_SLOTS.includes(timeSlot)) {
-  price += APP_CONFIG.nightFee || 10;
+  // 🧺 ค่าซัก
+  const laundryPrice = calculateLaundryPrice();
+
+  const total = deliveryPrice + laundryPrice;
+
+  priceEl.innerText =
+    `🚚 ค่าส่ง ${deliveryPrice} + 🧺 ค่าซัก ${laundryPrice} = 💰 ${total} บาท`;
 }
 
-
-
-  priceEl.innerText = `💰 ราคาประมาณ: ${price} บาท`;
-
-}
 document.addEventListener("DOMContentLoaded", async () => {
   await loadConfig();
 });
@@ -202,45 +202,59 @@ async function submitBooking() {
   const bookingDate = document.getElementById("bookingDate").value;
   const timeSlot = document.getElementById("timeSlot").value;
   const weight = Number(document.getElementById("weight").value);
-  const priceText = document.getElementById("price").innerText;
+  // 🔹 ค่าขนส่ง (เหมือน updatePrice แต่เอาเป็นตัวเลข)
+let deliveryPrice = weight * (APP_CONFIG.pricePerKg || 2);
+
+if (NIGHT_SLOTS.includes(timeSlot)) {
+  deliveryPrice += APP_CONFIG.nightFee || 10;
+}
+
+if (currentDistance <= 500) deliveryPrice += 20;
+else if (currentDistance <= 750) deliveryPrice += 30;
+else return alert("❌ นอกพื้นที่ให้บริการ");
+
+  const laundryPrice = calculateLaundryPrice();
 
   if (!bookingDate) return alert("กรุณาเลือกวันที่");
-  if (!priceText.includes("บาท")) return alert("กรุณาเลือกจุดรับผ้า");
 
   const selected = new Date(`${bookingDate} ${timeSlot}`);
   if (selected < new Date()) {
     return alert("ไม่สามารถจองย้อนหลังได้");
   }
 
-  const price = Number(priceText.replace(/[^\d]/g, ""));
+  const totalPrice = deliveryPrice + laundryPrice;
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
   try {
     // ✅ บันทึก order แค่ครั้งเดียว
     const ref = await db.collection("orders").add({
-      userId: user.uid,
-      username: u.username,
-      phone: u.phone,
-      note: customerNote,
+  userId: user.uid,
+  username: u.username,
+  phone: u.phone,
+  note: customerNote,
 
-      lat,
-      lng,
+  lat,
+  lng,
 
-      weight,
-      price,
-      bookingDate,
-      timeSlot,
+  weight,
+  bookingDate,
+  timeSlot,
 
-      paymentMethod: selectedPayment,
-      paymentStatus:
-        selectedPayment === "cash"
-          ? "pay_on_delivery"
-          : "waiting_transfer",
+  deliveryPrice,   // 🚚 ค่าส่ง
+  laundryPrice,    // 🧺 ค่าซัก
+  price: totalPrice, // 💰 รวมทั้งหมด
 
-      status: "wait",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+  paymentMethod: selectedPayment,
+  paymentStatus:
+    selectedPayment === "cash"
+      ? "pay_on_delivery"
+      : "waiting_transfer",
+
+  status: "wait",
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+
 
     // ✅ แยกเส้นทางชัดเจน
     if (selectedPayment === "transfer") {
