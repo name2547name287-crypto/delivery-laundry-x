@@ -36,44 +36,35 @@ const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
 
 // ===== PRICE =====
 function updatePrice() {
-  const weight = Number(document.getElementById("weight")?.value) || 10;
-  const timeSlot = document.getElementById("timeSlot")?.value;
   const priceEl = document.getElementById("price");
-
   if (!priceEl) return;
 
-  if (!currentDistance || currentDistance === 0) {
+  if (!currentDistance || !isInServiceArea) {
     priceEl.innerText = "📍 กรุณาเลือกจุดรับผ้าบนแผนที่";
     return;
   }
 
-  if (!isInServiceArea) {
+  const result = calculateTotalPrice({
+    weight: Number(weight.value),
+    distance: currentDistance,
+    timeSlot: timeSlot.value,
+
+    temp: washTemp.value,
+    extraMinute: Number(extraMinute.value),
+    dryMinute: Number(dryMinute.value),
+    folding: folding.checked
+  });
+
+  if (!result) {
     priceEl.innerText = "❌ อยู่นอกพื้นที่ให้บริการ";
     return;
   }
 
-  // 🚚 ค่าส่ง
-  let deliveryPrice = weight * (APP_CONFIG.pricePerKg || 2);
-
-  if (NIGHT_SLOTS.includes(timeSlot)) {
-    deliveryPrice += APP_CONFIG.nightFee || 10;
-  }
-
-  if (currentDistance <= 500) deliveryPrice += 20;
-  else if (currentDistance <= 750) deliveryPrice += 30;
-  else {
-    priceEl.innerText = "❌ นอกพื้นที่ให้บริการ";
-    return;
-  }
-
-  // 🧺 ค่าซัก
-  const laundryPrice = calculateLaundryPrice();
-
-  const total = deliveryPrice + laundryPrice;
-
   priceEl.innerText =
-    `🚚 ค่าส่ง ${deliveryPrice} + 🧺 ค่าซัก ${laundryPrice} = 💰 ${total} บาท`;
+    `🚚 ค่าส่ง ${result.delivery} + 🧺 ค่าซัก ${result.laundry}
+     = 💰 ${result.total} บาท`;
 }
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadConfig();
@@ -202,18 +193,21 @@ async function submitBooking() {
   const bookingDate = document.getElementById("bookingDate").value;
   const timeSlot = document.getElementById("timeSlot").value;
   const weight = Number(document.getElementById("weight").value);
-  // 🔹 ค่าขนส่ง (เหมือน updatePrice แต่เอาเป็นตัวเลข)
-let deliveryPrice = weight * (APP_CONFIG.pricePerKg || 2);
+  const priceResult = calculateTotalPrice({
+  weight,
+  distance: currentDistance,
+  timeSlot,
 
-if (NIGHT_SLOTS.includes(timeSlot)) {
-  deliveryPrice += APP_CONFIG.nightFee || 10;
+  temp: washTemp.value,
+  extraMinute: Number(extraMinute.value),
+  dryMinute: Number(dryMinute.value),
+  folding: folding.checked
+});
+
+if (!priceResult) {
+  return alert("❌ อยู่นอกพื้นที่ให้บริการ");
 }
 
-if (currentDistance <= 500) deliveryPrice += 20;
-else if (currentDistance <= 750) deliveryPrice += 30;
-else return alert("❌ นอกพื้นที่ให้บริการ");
-
-  const laundryPrice = calculateLaundryPrice();
 
   if (!bookingDate) return alert("กรุณาเลือกวันที่");
 
@@ -241,9 +235,10 @@ else return alert("❌ นอกพื้นที่ให้บริการ
   bookingDate,
   timeSlot,
 
-  deliveryPrice,   // 🚚 ค่าส่ง
-  laundryPrice,    // 🧺 ค่าซัก
-  price: totalPrice, // 💰 รวมทั้งหมด
+deliveryPrice: priceResult.delivery,   // 🚚 ค่าส่ง
+laundryPrice: priceResult.laundry,     // 🧺 ค่าซัก
+price: priceResult.total,              // 💰 รวมทั้งหมด
+
 
   paymentMethod: selectedPayment,
   paymentStatus:
@@ -285,3 +280,14 @@ function selectPayment(type) {
 
   console.log("💳 payment =", selectedPayment);
 }
+
+[
+  "weight",
+  "timeSlot",
+  "washTemp",
+  "extraMinute",
+  "dryMinute",
+  "folding"
+].forEach(id => {
+  document.getElementById(id)?.addEventListener("change", updatePrice);
+});
