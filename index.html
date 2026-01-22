@@ -545,6 +545,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadPriceConfig();
 });
 
+const washMinute = document.getElementById("washMinute");
+washMinute.addEventListener("change", () => {
+  updatePrice();
+});
+
 const useDryEl = document.getElementById("useDry");
 const dryMinuteEl = document.getElementById("dryMinute");
 
