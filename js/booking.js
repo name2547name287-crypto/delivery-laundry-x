@@ -222,6 +222,7 @@ const DRY_MACHINES = [
   distance: currentDistance,
   timeSlot,
   temp: washTemp.value,
+  washminute: Number(washMinute.value),
   dryMinute: Number(dryMinute.value),
   folding: folding.checked
 });
@@ -302,7 +303,7 @@ function selectPayment(type) {
   "weight",
   "timeSlot",
   "washTemp",
-  "extraMinute",
+  "washMinute",
   "dryMinute",
   "folding"
 ].forEach(id => {

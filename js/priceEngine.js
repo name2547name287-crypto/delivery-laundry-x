@@ -120,7 +120,7 @@ function calculateTotalPrice(input) {
   if (delivery === null) return null;
 
   // 🧺 WASH
-  const wash = calculateBestWash(weight, temp);
+  const wash = calculateBestWash(weight, temp, washminute);
 
   // 🔥 DRY
   let dry = null;
