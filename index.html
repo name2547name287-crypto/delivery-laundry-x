@@ -364,9 +364,15 @@ body {
 </select>
 
 <label>
-  ⏱ เพิ่มเวลา
-  <input id="extraMinute" type="number" value="0">
+  ⏱ เพิ่มเวลาซัก 1=1฿=10นาที
+  <input id="washMinute" type="number" value="0" min="0" step="10" disabled>
 </label>
+
+<small>
+  ระบบเลือกเครื่องซักให้อัตโนมัติ  
+  (+10 บาท ต่อ 10 นาที)
+</small>
+
 
 <hr>
 
@@ -378,12 +384,12 @@ body {
 </label>
 
 <label>
-  ⏱ เพิ่มเวลาอบ (นาที)
-  <input id="dryMinute" type="number" value="0" min="0" disabled>
+  ⏱ เพิ่มเวลาอบ 1=1฿=10นาที
+  <input id="dryMinute" type="number" value="0" min="0" step="10" disabled>
 </label>
 
 <small>
-  ระบบจะเลือกเครื่องอบและราคาที่คุ้มที่สุดให้อัตโนมัติ  
+  ระบบเลือกเครื่องอบให้อัตโนมัติ  
   (+10 บาท ต่อ 10 นาที)
 </small>
 

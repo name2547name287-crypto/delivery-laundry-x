@@ -36,7 +36,7 @@ function calculateDelivery(weight, distance, timeSlot) {
 }
 
 // ================= BEST WASH =================
-function calculateBestWash(weight, temp) {
+function calculateBestWash(weight, temp, extraMinute) {
   let best = { price: Infinity, machines: [] };
 
   function dfs(currentKg, price, machines) {
@@ -57,6 +57,10 @@ function calculateBestWash(weight, temp) {
   }
 
   dfs(0, 0, []);
+
+  if (best.price === Infinity) return null;
+
+  best.price += Math.ceil(extraMinute / 10) * EXTRA_WASH_PER_10;
   return best;
 }
 
@@ -66,8 +70,8 @@ function calculateBestWash(weight, temp) {
 function calculateBestDry(weight, extraMinute) {
   let best = { price: Infinity, machines: [] };
 
-  function dfs(kg, price, machines) {
-    if (kg >= weight) {
+  function dfs(currentKg, price, machines) {
+    if (currentKg >= weight) {
       if (price < best.price) {
         best = { price, machines };
       }
@@ -75,7 +79,11 @@ function calculateBestDry(weight, extraMinute) {
     }
 
     for (const m of DRY_MACHINES) {
-      dfs(kg + m.kg, price + m.price, [...machines, m.kg]);
+      dfs(
+        currentKg + m.kg,
+        price + m.price,
+        [...machines, m.kg]
+      );
     }
   }
 
@@ -83,9 +91,16 @@ function calculateBestDry(weight, extraMinute) {
 
   if (best.price === Infinity) return null;
 
-  best.price += Math.ceil(extraMinute / 10) * EXTRA_DRY_PER_10;
-  return best;
+  const extra =
+    Math.ceil(extraMinute / 10) * EXTRA_DRY_PER_10;
+
+  return {
+    price: best.price + extra,
+    machines: best.machines,
+    extraMinute
+  };
 }
+
 
 // ================= TOTAL =================
 function calculateTotalPrice(input) {
@@ -94,6 +109,7 @@ function calculateTotalPrice(input) {
     distance,
     timeSlot,
     temp,
+    washminute,
     dryMinute,
     folding,
     useDry
