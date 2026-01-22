@@ -57,6 +57,9 @@ const result = calculateTotalPrice({
   useDry: useDry.checked
 });
 
+if (useDry.checked && Number(dryMinute.value) < 0) {
+  dryMinute.value = 0;
+}
 
 
   if (!result) {
@@ -313,7 +316,28 @@ function selectPayment(type) {
   "dryMinute",
   "folding"
 ].forEach(id => {
-  document.getElementById(id)?.addEventListener("change", updatePrice);
+ document.getElementById(id)?.addEventListener("change", updatePrice);
+});
+["dryMinute", "washMinute"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input", updatePrice);
 });
 
+
+document.addEventListener("DOMContentLoaded", () => {
+  const useDryEl = document.getElementById("useDry");
+  const dryMinuteEl = document.getElementById("dryMinute");
+
+  if (!useDryEl || !dryMinuteEl) return;
+
+  useDryEl.addEventListener("change", () => {
+    if (useDryEl.checked) {
+      dryMinuteEl.disabled = false;
+    } else {
+      dryMinuteEl.disabled = true;
+      dryMinuteEl.value = 0;
+    }
+
+    updatePrice(); // 🔥 สำคัญมาก
+  });
+});
 
