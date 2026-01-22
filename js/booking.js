@@ -1,5 +1,12 @@
  alert("booking.js loaded");
 
+ const weight = document.getElementById("weight");
+const timeSlot = document.getElementById("timeSlot");
+const washTemp = document.getElementById("washTemp");
+const dryMinute = document.getElementById("dryMinute");
+const folding = document.getElementById("folding");
+const useDry = document.getElementById("useDry");
+
 let APP_CONFIG = {
   serviceRadius: 750,
   pricePerKg: 2,
@@ -35,17 +42,19 @@ const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
 
 
 // ===== PRICE =====
-function updatePrice() {
-  if (!isInServiceArea) return;
+const priceEl = document.getElementById("price");
 
-  const result = calculateTotalPrice({
-    weight: Number(weight.value),
-    distance: currentDistance,
-    timeSlot: timeSlot.value,
-    temp: washTemp.value,
-    dryMinute: Number(dryMinute.value),
-    folding: folding.checked
-  });
+function updatePrice() {
+const result = calculateTotalPrice({
+  weight: Number(weight.value),
+  distance: currentDistance,
+  timeSlot: timeSlot.value,
+  temp: washTemp.value,
+  dryMinute: Number(dryMinute.value),
+  folding: folding.checked,
+  useDry: useDry.checked
+});
+
 
   if (!result) {
     price.innerText = "❌ คำนวณไม่ได้";
@@ -203,84 +212,7 @@ const DRY_MACHINES = [
   { kg: 25, baseMinute: 30, price: 70 }
 ];
 
-function calculateBestWash(weight, temp) {
-  let bestPrice = Infinity;
-  let bestMachines = [];
 
-  function dfs(currentKg, currentPrice, usedMachines) {
-    if (currentKg >= weight) {
-      if (currentPrice < bestPrice) {
-        bestPrice = currentPrice;
-        bestMachines = [...usedMachines];
-      }
-      return;
-    }
-
-    for (const m of WASH_MACHINES) {
-      dfs(
-        currentKg + m.kg,
-        currentPrice + m[temp],
-        [...usedMachines, m.kg]
-      );
-    }
-  }
-
-  dfs(0, 0, []);
-
-  if (bestPrice === Infinity) return null;
-
-  return {
-    price: bestPrice,
-    machines: bestMachines
-  };
-}
-
-function calculateBestDry(weight) {
-  let bestPrice = Infinity;
-  let bestMachines = [];
-
-  function dfs(currentKg, currentPrice, used) {
-    if (currentKg >= weight) {
-      if (currentPrice < bestPrice) {
-        bestPrice = currentPrice;
-        bestMachines = [...used];
-      }
-      return;
-    }
-
-    for (const m of DRY_MACHINES) {
-      dfs(
-        currentKg + m.kg,
-        currentPrice + m.price,
-        [...used, m.kg]
-      );
-    }
-  }
-
-  dfs(0, 0, []);
-
-  if (bestPrice === Infinity) return null;
-
-  return {
-    price: bestPrice,
-    machines: bestMachines
-  };
-}
-const EXTRA_DRY_PRICE_PER_10_MIN = 10;
-
-function calculateDryPrice(weight, extraMinute) {
-  const base = calculateBestDry(weight);
-  if (!base) return null;
-
-  const extraCost =
-    Math.ceil(extraMinute / 10) * EXTRA_DRY_PRICE_PER_10_MIN;
-
-  return {
-    price: base.price + extraCost,
-    machines: base.machines,
-    extraMinute
-  };
-}
 
  const priceResult = calculateTotalPrice({
   weight,

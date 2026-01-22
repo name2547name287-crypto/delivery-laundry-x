@@ -382,9 +382,11 @@ body {
   <input id="dryMinute" type="number" value="0" min="0" disabled>
 </label>
 
-<small style="color:#777">
-  * ระบบจะเลือกเครื่องอบและราคาที่คุ้มที่สุดให้อัตโนมัติ
+<small>
+  ระบบจะเลือกเครื่องอบและราคาที่คุ้มที่สุดให้อัตโนมัติ  
+  (+10 บาท ต่อ 10 นาที)
 </small>
+
 
 
 <hr>
@@ -532,10 +534,6 @@ async function loadLaundryPricing() {
 
 loadLaundryPricing();
 
-["washTemp", "extraMinute", "dryMinute", "folding", "weight"]
-  .forEach(id => {
-    document.getElementById(id)?.addEventListener("change", calculateLaundryPrice);
-  });
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadPriceConfig();
@@ -553,6 +551,7 @@ useDryEl.addEventListener("change", () => {
   }
   updatePrice();
 });
+
 
 
 </script>
