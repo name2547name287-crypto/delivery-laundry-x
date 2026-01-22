@@ -261,20 +261,26 @@ if (!priceResult) {
 
   try {
     // ✅ บันทึก order แค่ครั้งเดียว
-    const ref = await db.collection("orders").add({
-  userId: user.uid,
-  weight,
-  bookingDate,
-  timeSlot,
+    await db.collection("orders").add({
+  // --- ของใหม่ ---
+  wash: priceResult.wash,
+  dry: priceResult.dry,
+  foldPrice: priceResult.foldPrice,
+  total: priceResult.total,
 
-  deliveryPrice: priceResult.delivery,
-  laundryPrice: priceResult.laundry,
-  totalPrice: priceResult.total,
-  machineDetail: priceResult.machineDetail,
-
+  // --- ของเก่า (ห้ามหาย) ---
+  price: priceResult.total,
   status: "wait",
+  lat,
+  lng,
+  paymentMethod: selectedPayment,
+  paymentStatus: selectedPayment === "cash"
+    ? "pay_on_delivery"
+    : "waiting_transfer",
+
   createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
+
 
 
 

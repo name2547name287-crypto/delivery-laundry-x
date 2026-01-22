@@ -226,9 +226,12 @@ function loadHistoryOrders() {
       box.innerHTML = "";
 
       const orders = [];
-      snapshot.forEach(doc => {
-        orders.push({ id: doc.id, ...doc.data() });
-      });
+     snapshot.forEach(doc => {
+  const raw = doc.data();
+  const order = adaptOrderForLegacy(raw);
+  renderOrder(order);
+});
+
 
       const grouped = groupByDateAndTime(orders);
 
