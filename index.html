@@ -324,7 +324,7 @@ body {
 
   <main class="app-content">
 
-    <label>น้ำหนัก (kg)</label>
+    <label>น้ำหนัก (kg) 2฿:1🇰🇬 </label>
     <input id="weight" type="number" value="10" min="10" oninput="updatePrice()">
 
 
@@ -371,21 +371,22 @@ body {
 <hr>
 
 <label>
-  🔥 อบผ้า (นาที)
+ <h3> 🔥 อบผ้า (นาที) </h3>
   <input id="dryMinute" type="number" value="0">
 </label>
 
 <hr>
 
 <label>
-  📦 พับผ้า
+  <h3> 📦 พับผ้า 1.5฿:1🇰🇬</h3>
   <input type="checkbox" id="folding">
 </label>
 
 <hr>
 
 <div>
-  🧾 ค่าซัก: <span id="washPrice">0</span> บาท
+  🧾 ค่าซัก 
+  <span id="washPrice">0</span> บาท
 </div>
 
 
@@ -522,35 +523,6 @@ async function loadLaundryPricing() {
 }
 
 loadLaundryPricing();
-
-function calculateLaundryPrice() {
-  if (!laundryPricing) return 0;
-
-  const weight = Number(document.getElementById("weight").value) || 0;
-
-  // 🔹 ซัก
-  const temp = document.getElementById("washTemp").value;
-  let price = laundryPricing.wash[temp];
-
-  // 🔹 เพิ่มเวลา
-  const extraMin = Number(extraMinute.value);
-  price += extraMin * laundryPricing.washExtraMinutePrice;
-
-  // 🔹 อบ
-  const dryMin = Number(dryMinute.value);
-  if (dryMin > 0) {
-    price += laundryPricing.dry.base;
-    price += Math.floor(dryMin / 10) * laundryPricing.dry.per10min;
-  }
-
-  // 🔹 พับ
-  if (folding.checked) {
-    price += weight * laundryPricing.foldPerKg;
-  }
-
-  document.getElementById("washPrice").innerText = price;
-  return price;
-}
 
 ["washTemp", "extraMinute", "dryMinute", "folding", "weight"]
   .forEach(id => {

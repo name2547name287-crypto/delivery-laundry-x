@@ -36,34 +36,30 @@ const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
 
 // ===== PRICE =====
 function updatePrice() {
-  const priceEl = document.getElementById("price");
-  if (!priceEl) return;
-
-  if (!currentDistance || !isInServiceArea) {
-    priceEl.innerText = "📍 กรุณาเลือกจุดรับผ้าบนแผนที่";
-    return;
-  }
+  if (!isInServiceArea) return;
 
   const result = calculateTotalPrice({
     weight: Number(weight.value),
     distance: currentDistance,
     timeSlot: timeSlot.value,
-
     temp: washTemp.value,
-    extraMinute: Number(extraMinute.value),
     dryMinute: Number(dryMinute.value),
     folding: folding.checked
   });
 
   if (!result) {
-    priceEl.innerText = "❌ อยู่นอกพื้นที่ให้บริการ";
+    price.innerText = "❌ คำนวณไม่ได้";
     return;
   }
 
-  priceEl.innerText =
-    `🚚 ค่าส่ง ${result.delivery} + 🧺 ค่าซัก ${result.laundry}
-     = 💰 ${result.total} บาท`;
+  price.innerText = `
+🚚 ค่าส่ง ${result.delivery} บาท
+🧺 ค่าซัก ${result.laundry} บาท
+🧠 เครื่อง ${result.machineDetail} kg
+💰 รวม ${result.total} บาท
+`;
 }
+
 
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -193,16 +189,112 @@ async function submitBooking() {
   const bookingDate = document.getElementById("bookingDate").value;
   const timeSlot = document.getElementById("timeSlot").value;
   const weight = Number(document.getElementById("weight").value);
-  const priceResult = calculateTotalPrice({
+  const WASH_MACHINES = [
+  { kg: 10, cold: 40, warm: 50, hot: 60 },
+  { kg: 14, cold: 60, warm: 70, hot: 80 },
+  { kg: 18, cold: 70, warm: 80, hot: 90 },
+  { kg: 28, cold: 100, warm: 120, hot: 140 }
+];
+const DRY_MACHINES = [
+  { kg: 15, baseMinute: 30, price: 50 },
+  { kg: 20, baseMinute: 30, price: 60 },
+  { kg: 25, baseMinute: 30, price: 70 }
+];
+
+function calculateBestWash(weight, temp) {
+  let bestPrice = Infinity;
+  let bestMachines = [];
+
+  function dfs(currentKg, currentPrice, usedMachines) {
+    if (currentKg >= weight) {
+      if (currentPrice < bestPrice) {
+        bestPrice = currentPrice;
+        bestMachines = [...usedMachines];
+      }
+      return;
+    }
+
+    for (const m of WASH_MACHINES) {
+      dfs(
+        currentKg + m.kg,
+        currentPrice + m[temp],
+        [...usedMachines, m.kg]
+      );
+    }
+  }
+
+  dfs(0, 0, []);
+
+  if (bestPrice === Infinity) return null;
+
+  return {
+    price: bestPrice,
+    machines: bestMachines
+  };
+}
+
+function calculateBestDry(weight) {
+  let bestPrice = Infinity;
+  let bestMachines = [];
+
+  function dfs(currentKg, currentPrice, used) {
+    if (currentKg >= weight) {
+      if (currentPrice < bestPrice) {
+        bestPrice = currentPrice;
+        bestMachines = [...used];
+      }
+      return;
+    }
+
+    for (const m of DRY_MACHINES) {
+      dfs(
+        currentKg + m.kg,
+        currentPrice + m.price,
+        [...used, m.kg]
+      );
+    }
+  }
+
+  dfs(0, 0, []);
+
+  if (bestPrice === Infinity) return null;
+
+  return {
+    price: bestPrice,
+    machines: bestMachines
+  };
+}
+const EXTRA_DRY_PRICE_PER_10_MIN = 10;
+
+function calculateDryPrice(weight, extraMinute) {
+  const base = calculateBestDry(weight);
+  if (!base) return null;
+
+  const extraCost =
+    Math.ceil(extraMinute / 10) * EXTRA_DRY_PRICE_PER_10_MIN;
+
+  return {
+    price: base.price + extraCost,
+    machines: base.machines,
+    extraMinute
+  };
+}
+
+ const priceResult = calculateTotalPrice({
   weight,
   distance: currentDistance,
   timeSlot,
-
   temp: washTemp.value,
-  extraMinute: Number(extraMinute.value),
   dryMinute: Number(dryMinute.value),
   folding: folding.checked
 });
+
+if (!priceResult) {
+  alert("คำนวณราคาไม่ได้");
+  return;
+}
+
+
 
 if (!priceResult) {
   return alert("❌ อยู่นอกพื้นที่ให้บริการ");
@@ -224,31 +316,19 @@ if (!priceResult) {
     // ✅ บันทึก order แค่ครั้งเดียว
     const ref = await db.collection("orders").add({
   userId: user.uid,
-  username: u.username,
-  phone: u.phone,
-  note: customerNote,
-
-  lat,
-  lng,
-
   weight,
   bookingDate,
   timeSlot,
 
-deliveryPrice: priceResult.delivery,   // 🚚 ค่าส่ง
-laundryPrice: priceResult.laundry,     // 🧺 ค่าซัก
-price: priceResult.total,              // 💰 รวมทั้งหมด
-
-
-  paymentMethod: selectedPayment,
-  paymentStatus:
-    selectedPayment === "cash"
-      ? "pay_on_delivery"
-      : "waiting_transfer",
+  deliveryPrice: priceResult.delivery,
+  laundryPrice: priceResult.laundry,
+  totalPrice: priceResult.total,
+  machineDetail: priceResult.machineDetail,
 
   status: "wait",
   createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
+
 
 
     // ✅ แยกเส้นทางชัดเจน
@@ -291,3 +371,5 @@ function selectPayment(type) {
 ].forEach(id => {
   document.getElementById(id)?.addEventListener("change", updatePrice);
 });
+
+
