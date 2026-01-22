@@ -66,8 +66,8 @@ const result = calculateTotalPrice({
 
   priceEl.innerText = `
 🚚 ค่าส่ง ${result.delivery} บาท
-🧺 ค่าซัก ${result.wash.price} บาท (${result.wash.machines.join(" + ")}kg)
-${result.dry ? `🔥 ค่าอบ ${result.dry.price} บาท (${result.dry.machines.join(" + ")}kg + ${result.dry.extraMinute} นาที)` : "🔥 ไม่อบผ้า"}
+🧺 ค่าซัก ${result.wash.price} บาท (${result.wash.machines.join(" + ")}kg + ${result.wash.washMinute} นาที)
+${result.dry ? `🔥 ค่าอบ ${result.dry.price} บาท (${result.dry.machines.join(" + ")}kg + ${result.dry.dryMinute} นาที)` : "🔥 ไม่อบผ้า"}
 📦 พับ ${result.foldPrice} บาท
 💰 รวม ${result.total} บาท
 `;
