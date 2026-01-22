@@ -324,7 +324,7 @@ body {
 
   <main class="app-content">
 
-    <label>น้ำหนัก (kg) 2฿:1🇰🇬 </label>
+    <label> น้ำหนัก (kg) 2฿:1kg </label>
     <input id="weight" type="number" value="10" min="10" oninput="updatePrice()">
 
 
@@ -370,24 +370,32 @@ body {
 
 <hr>
 
+<h3>🔥 อบผ้า</h3>
+
 <label>
- <h3> 🔥 อบผ้า (นาที) </h3>
-  <input id="dryMinute" type="number" value="0">
+  <input type="checkbox" id="useDry">
+  ต้องการอบผ้า
 </label>
+
+<label>
+  ⏱ เพิ่มเวลาอบ (นาที)
+  <input id="dryMinute" type="number" value="0" min="0" disabled>
+</label>
+
+<small style="color:#777">
+  * ระบบจะเลือกเครื่องอบและราคาที่คุ้มที่สุดให้อัตโนมัติ
+</small>
+
 
 <hr>
 
 <label>
-  <h3> 📦 พับผ้า 1.5฿:1🇰🇬</h3>
+  <h3> 📦 พับผ้า 1.5฿:1kg</h3>
   <input type="checkbox" id="folding">
 </label>
 
 <hr>
 
-<div>
-  🧾 ค่าซัก 
-  <span id="washPrice">0</span> บาท
-</div>
 
 
 <h3>📍 เลือกจุดรับผ้า</h3>
@@ -532,6 +540,20 @@ loadLaundryPricing();
 document.addEventListener("DOMContentLoaded", async () => {
   await loadPriceConfig();
 });
+
+const useDryEl = document.getElementById("useDry");
+const dryMinuteEl = document.getElementById("dryMinute");
+
+useDryEl.addEventListener("change", () => {
+  if (useDryEl.checked) {
+    dryMinuteEl.disabled = false;
+  } else {
+    dryMinuteEl.disabled = true;
+    dryMinuteEl.value = 0;
+  }
+  updatePrice();
+});
+
 
 </script>
 

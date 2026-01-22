@@ -12,6 +12,9 @@ const DRY_MACHINES = [
   { kg: 25, price: 70 }
 ];
 
+const EXTRA_DRY_PRICE_PER_10_MIN = 10;
+
+
 const EXTRA_DRY_PER_10 = 10;
 const FOLD_PER_KG = 1.5;
 
@@ -82,22 +85,35 @@ function calculateTotalPrice({
   distance,
   timeSlot,
   temp,
-  dryMinute,
+  useDry,
+  extraDryMinute,
   folding
 }) {
-  const delivery = calculateDelivery(weight, distance, timeSlot);
-  if (delivery === null) return null;
 
+  // 🚚 ค่าส่ง (เหมือนเดิม)
+  let delivery = weight * (APP_CONFIG.pricePerKg || 2);
+
+  if (NIGHT_SLOTS.includes(timeSlot)) {
+    delivery += APP_CONFIG.nightFee || 10;
+  }
+
+  if (distance <= 500) delivery += 20;
+  else if (distance <= 750) delivery += 30;
+  else return null;
+
+  // 🧺 ซัก
   const wash = calculateBestWash(weight, temp);
   if (!wash) return null;
 
+  // 🔥 อบ
   let dry = null;
-  if (dryMinute > 0) {
-    dry = calculateBestDry(weight, dryMinute);
+  if (useDry) {
+    dry = calculateDryPrice(weight, extraDryMinute);
     if (!dry) return null;
   }
 
-  const foldPrice = folding ? weight * FOLD_PER_KG : 0;
+  // 📦 พับ
+  let foldPrice = folding ? weight * 1.5 : 0;
 
   const total =
     delivery +
@@ -107,8 +123,56 @@ function calculateTotalPrice({
 
   return {
     delivery,
-    laundry: wash.price + (dry ? dry.price : 0) + foldPrice,
-    total,
-    machineDetail: wash.machines.join(" + ")
+    wash,
+    dry,
+    foldPrice,
+    total
+  };
+}
+
+
+function calculateBestDry(weight) {
+  let bestPrice = Infinity;
+  let bestMachines = [];
+
+  function dfs(currentKg, currentPrice, used) {
+    if (currentKg >= weight) {
+      if (currentPrice < bestPrice) {
+        bestPrice = currentPrice;
+        bestMachines = [...used];
+      }
+      return;
+    }
+
+    for (const m of DRY_MACHINES) {
+      dfs(
+        currentKg + m.kg,
+        currentPrice + m.price,
+        [...used, m.kg]
+      );
+    }
+  }
+
+  dfs(0, 0, []);
+
+  if (bestPrice === Infinity) return null;
+
+  return {
+    price: bestPrice,
+    machines: bestMachines
+  };
+}
+
+function calculateDryPrice(weight, extraMinute) {
+  const base = calculateBestDry(weight);
+  if (!base) return null;
+
+  const extraCost =
+    Math.ceil(extraMinute / 10) * EXTRA_DRY_PRICE_PER_10_MIN;
+
+  return {
+    price: base.price + extraCost,
+    machines: base.machines,
+    extraMinute
   };
 }

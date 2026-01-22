@@ -52,12 +52,14 @@ function updatePrice() {
     return;
   }
 
-  price.innerText = `
+  priceEl.innerText = `
 🚚 ค่าส่ง ${result.delivery} บาท
-🧺 ค่าซัก ${result.laundry} บาท
-🧠 เครื่อง ${result.machineDetail} kg
+🧺 ค่าซัก ${result.wash.price} บาท (${result.wash.machines.join(" + ")}kg)
+${result.dry ? `🔥 ค่าอบ ${result.dry.price} บาท (${result.dry.machines.join(" + ")}kg + ${result.dry.extraMinute} นาที)` : ""}
+📦 พับ ${result.foldPrice} บาท
 💰 รวม ${result.total} บาท
 `;
+
 }
 
 
