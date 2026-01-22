@@ -6,7 +6,7 @@ const washTemp = document.getElementById("washTemp");
 const dryMinute = document.getElementById("dryMinute");
 const folding = document.getElementById("folding");
 const useDry = document.getElementById("useDry");
-const washminute = document.getElementById("washMinute");
+const washMinute = document.getElementById("washMinute");
 
 let APP_CONFIG = {
   serviceRadius: 750,
@@ -60,14 +60,16 @@ const result = calculateTotalPrice({
 
 
   if (!result) {
-    price.innerText = "❌ คำนวณไม่ได้";
+ priceEl.innerText = "❌ คำนวณไม่ได้";
     return;
   }
 
   priceEl.innerText = `
 🚚 ค่าส่ง ${result.delivery} บาท
- ${result.wash ? `🧺 ค่าซัก ${result.wash.price} บาท (${result.wash.machines.join(" + ")}kg + ${result.wash.washMinute} นาที)` : "ไม่ซัก"}
- ${result.dry ? `🔥 ค่าอบ ${result.dry.price} บาท (${result.dry.machines.join(" + ")}kg + ${result.dry.dryMinute} นาที)` : "🔥 ไม่อบผ้า"}
+ ${result.wash
+  ? `🧺 ค่าซัก ${result.wash.price} บาท (${result.wash.machines.join(" + ")}kg)`
+  : "ไม่ซัก"}
+ ${result.dry ? `🔥 ค่าอบ ${result.dry.price} บาท (${result.dry.machines.join(" + ")}kg)` : "🔥 ไม่อบผ้า"}
 📦 พับ ${result.foldPrice} บาท
 💰 รวม ${result.total} บาท
 `;
@@ -217,15 +219,17 @@ const DRY_MACHINES = [
 
 
 
- const priceResult = calculateTotalPrice({
+const priceResult = calculateTotalPrice({
   weight,
   distance: currentDistance,
   timeSlot,
   temp: washTemp.value,
-  washminute: Number(washMinute.value),
+  washMinute: Number(washMinute.value),
   dryMinute: Number(dryMinute.value),
-  folding: folding.checked
+  folding: folding.checked,
+  useDry: useDry.checked
 });
+
 
 if (!priceResult) {
   alert("คำนวณราคาไม่ได้");
@@ -245,8 +249,10 @@ if (!priceResult) {
   if (selected < new Date()) {
     return alert("ไม่สามารถจองย้อนหลังได้");
   }
+  priceResult.total
 
-  const totalPrice = deliveryPrice + laundryPrice;
+  console.log("📍 ตำแหน่งผู้ใช้:", marker.getPosition().toJSON());
+  p
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 

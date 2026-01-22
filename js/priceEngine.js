@@ -109,7 +109,7 @@ function calculateTotalPrice(input) {
     distance,
     timeSlot,
     temp,
-    washminute,
+    washMinute,
     dryMinute,
     folding,
     useDry
@@ -120,7 +120,7 @@ function calculateTotalPrice(input) {
   if (delivery === null) return null;
 
   // 🧺 WASH
-  const wash = calculateBestWash(weight, temp, washminute);
+  const wash = calculateBestWash(weight, temp, washMinute);
 
   // 🔥 DRY
   let dry = null;
