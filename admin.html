@@ -359,7 +359,6 @@ function setStatus(orderId, newStatus) {
       status: newStatus
     });
 }
-
 async function loadLaundryPricing() {
   const snap = await db.collection("pricing").doc("laundry").get();
   if (!snap.exists) return;
@@ -396,7 +395,6 @@ async function saveLaundryPricing() {
   alert("✅ บันทึกราคาซักแล้ว");
 }
 
-loadLaundryPricing();
 loadActiveOrders();
 loadHistoryOrders();
 

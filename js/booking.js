@@ -3,10 +3,10 @@
  const weight = document.getElementById("weight");
 const timeSlot = document.getElementById("timeSlot");
 const washTemp = document.getElementById("washTemp");
-const dryMinute = document.getElementById("dryMinute");
+const dryMinuteEl  = document.getElementById("dryMinute");
 const folding = document.getElementById("folding");
 const useDry = document.getElementById("useDry");
-const washMinute = document.getElementById("washMinute");
+const washMinuteEl = document.getElementById("washMinute");
 
 let APP_CONFIG = {
   serviceRadius: 750,
@@ -51,8 +51,8 @@ const result = calculateTotalPrice({
   distance: currentDistance,
   timeSlot: timeSlot.value,
   temp: washTemp.value,
-  washMinute: Number(washMinute.value),
-  dryMinute: Number(dryMinute.value),
+ washMinute: Number(washMinuteEl.value),
+  dryMinute: Number(dryMinuteEl.value),
   folding: folding.checked,
   useDry: useDry.checked
 });
@@ -227,8 +227,8 @@ const priceResult = calculateTotalPrice({
   distance: currentDistance,
   timeSlot,
   temp: washTemp.value,
-  washMinute: Number(washMinute.value),
-  dryMinute: Number(dryMinute.value),
+  washMinute: Number(washMinuteEl.value),
+  dryMinute: Number(dryMinuteEl.value),
   folding: folding.checked,
   useDry: useDry.checked
 });
@@ -252,16 +252,14 @@ if (!priceResult) {
   if (selected < new Date()) {
     return alert("ไม่สามารถจองย้อนหลังได้");
   }
-  priceResult.total
-
+  
   console.log("📍 ตำแหน่งผู้ใช้:", marker.getPosition().toJSON());
-  p
   const lat = marker.getPosition().lat();
   const lng = marker.getPosition().lng();
 
   try {
     // ✅ บันทึก order แค่ครั้งเดียว
-    await db.collection("orders").add({
+  const ref = await db.collection("orders").add({
   // --- ของใหม่ ---
   wash: priceResult.wash,
   dry: priceResult.dry,

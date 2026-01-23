@@ -364,7 +364,7 @@ body {
 </select>
 
 <label>
-  ⏱ เพิ่มเวลาซัก 1=1฿=10นาที
+  ⏱ เพิ่มเวลาซัก 
   <input id="washMinute" type="number" value="0" min="0" step="10">
 </label>
 
@@ -384,7 +384,7 @@ body {
 </label>
 
 <label>
-  ⏱ เพิ่มเวลาอบ 1=1฿=10นาที
+  ⏱ เพิ่มเวลาอบ 
   <input id="dryMinute" type="number" value="0" min="0" step="10" disabled>
 </label>
 
@@ -526,42 +526,6 @@ auth.onAuthStateChanged(async user => {
 });
 
 
-let laundryPricing = null;
-
-async function loadLaundryPricing() {
-  const snap = await db.collection("pricing").doc("laundry").get();
-  if (!snap.exists) {
-    alert("ไม่พบราคาซัก");
-    return;
-  }
-  laundryPricing = snap.data();
-  console.log("🧺 laundry pricing", laundryPricing);
-}
-
-loadLaundryPricing();
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadPriceConfig();
-});
-
-const washMinute = document.getElementById("washMinute");
-washMinute.addEventListener("change", () => {
-  updatePrice();
-});
-
-const useDryEl = document.getElementById("useDry");
-const dryMinuteEl = document.getElementById("dryMinute");
-
-useDryEl.addEventListener("change", () => {
-  if (useDryEl.checked) {
-    dryMinuteEl.disabled = false;
-  } else {
-    dryMinuteEl.disabled = true;
-    dryMinuteEl.value = 0;
-  }
-  updatePrice();
-});
 
 
 
