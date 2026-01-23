@@ -260,22 +260,26 @@ if (!priceResult) {
   try {
     // ✅ บันทึก order แค่ครั้งเดียว
   const ref = await db.collection("orders").add({
-  // ✅ ของใหม่
+  // ===== NEW SYSTEM =====
   wash: priceResult.wash,
   dry: priceResult.dry,
   foldPrice: priceResult.foldPrice,
   total: priceResult.total,
 
-  // ✅ ของเก่า (admin / rider ใช้)
-  price: priceResult.total,
+  // ===== LEGACY (ห้ามหาย) =====
+  userId: user.uid,
+  username: u.username,
+  phone: u.phone,
+
+  bookingDate,
+  timeSlot,
   weight,
-  status: "wait",       // ใหม่
-legacyStatus: "pending", // เก่า
-  note: customerNote || "",
-  service: "laundry",
 
   lat,
   lng,
+
+  price: priceResult.total,
+  status: "wait",
 
   paymentMethod: selectedPayment,
   paymentStatus: selectedPayment === "cash"
