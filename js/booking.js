@@ -46,24 +46,19 @@ const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
 const priceEl = document.getElementById("price");
 
 function updatePrice() {
-const result = calculateTotalPrice({
-  weight: Number(weight.value),
-  distance: currentDistance,
-  timeSlot: timeSlot.value,
-  temp: washTemp.value,
-  washMinute: Number(wash.ExtraMinuteEl.value),
-  dryMinute: Number(dry.ExtraMinuteEl.value),
-  folding: folding.checked,
-  useDry: useDry.checked
-});
-
-if (useDry.checked && Number(dry.ExtraMinuteEl.value) < 0) {
-  dry.ExtraMinuteEl.value = 0;
-}
-
+  const result = calculateTotalPrice({
+    weight: Number(weight.value),
+    distance: currentDistance,
+    timeSlot: timeSlot.value,
+    temp: washTemp.value,
+    washExtraMinute: Number(washExtraMinuteEl?.value || 0),
+    dryExtraMinute: Number(dryExtraMinuteEl?.value || 0),
+    folding: folding.checked,
+    useDry: useDry.checked
+  });
 
   if (!result) {
- priceEl.innerText = "❌ คำนวณไม่ได้";
+    priceEl.innerText = "❌ คำนวณไม่ได้";
     return;
   }
 
@@ -333,20 +328,20 @@ function selectPayment(type) {
   "weight",
   "timeSlot",
   "washTemp",
-  "wash.ExtraMinute",
-  "dry.ExtraMinute",
+  "washExtraMinute",
+  "dryExtraMinute",
   "folding"
 ].forEach(id => {
  document.getElementById(id)?.addEventListener("change", updatePrice);
 });
-["dry.ExtraMinute", "wash.ExtraMinute"].forEach(id => {
+["dryExtraMinute", "washExtraMinute"].forEach(id => {
   document.getElementById(id)?.addEventListener("input", updatePrice);
 });
 
 
 document.addEventListener("DOMContentLoaded", () => {
   const useDryEl = document.getElementById("useDry");
-  const dryMinuteEl = document.getElementById("dry.ExtraMinute");
+  const dryMinuteEl = document.getElementById("dryExtraMinute");
 
   if (!useDryEl || !dryMinuteEl) return;
 
@@ -362,7 +357,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-const washExtra = Number(document.getElementById("washMinute").value || 0);
+const washExtraMinute =
+  Number(document.getElementById("washExtraMinute")?.value || 0);
+
+const dryExtraMinute =
+  Number(document.getElementById("dryExtraMinute")?.value || 0);
+
 
 orderData.wash = {
   temp: washTemp.value,
