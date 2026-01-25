@@ -397,6 +397,40 @@ async function saveLaundryPricing() {
   alert("✅ บันทึกราคาซักแล้ว");
 }
 
+function renderOrderDetail(order) {
+  let html = "";
+
+  if (order.wash) {
+    html += `
+🧺 ซักผ้า
+- เครื่อง: ${order.wash.machines.join(" + ")} kg
+- เพิ่มเวลา: ${order.wash.extraMinute || 0} นาที
+- ราคา: ${order.wash.price} บาท
+`;
+  }
+
+  if (order.dry) {
+    html += `
+🔥 อบผ้า
+- เครื่อง: ${order.dry.machines.join(" + ")} kg
+- เพิ่มเวลา: ${order.dry.extraMinute || 0} นาที
+- ราคา: ${order.dry.price} บาท
+`;
+  }
+
+  html += `
+📦 พับผ้า: ${order.foldPrice} บาท
+🚚 ค่าส่ง: ${order.delivery} บาท
+💰 รวมทั้งหมด: ${order.total} บาท
+`;
+
+  return html;
+}
+
+const detail = renderOrderDetail(order);
+detailBox.innerText = detail;
+
+
 loadActiveOrders();
 loadHistoryOrders();
 

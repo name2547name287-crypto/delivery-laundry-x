@@ -67,15 +67,22 @@ if (useDry.checked && Number(dryMinute.value) < 0) {
     return;
   }
 
-  priceEl.innerText = `
-🚚 ค่าส่ง ${result.delivery} บาท
- ${result.wash
-  ? `🧺 ค่าซัก ${result.wash.price} บาท (${result.wash.machines.join(" + ")}kg)`
-  : "ไม่ซัก"}
- ${result.dry ? `🔥 ค่าอบ ${result.dry.price} บาท (${result.dry.machines.join(" + ")}kg)` : "🔥 ไม่อบผ้า"}
+ priceEl.innerText = `
+🧺 ซัก ${result.wash.price} บาท
+- เครื่อง: ${result.wash.machines.join(" + ")} kg
+- เพิ่มเวลา: ${result.wash.extraMinute} นาที
+
+${result.dry ? `
+🔥 อบ ${result.dry.price} บาท
+- เครื่อง: ${result.dry.machines.join(" + ")} kg
+- เพิ่มเวลา: ${result.dry.extraMinute} นาที
+` : "🔥 ไม่อบ"}
+
 📦 พับ ${result.foldPrice} บาท
+🚚 ค่าส่ง ${result.delivery} บาท
 💰 รวม ${result.total} บาท
 `;
+
 
 }
 

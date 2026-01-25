@@ -1,16 +1,17 @@
-function adaptOrderForLegacy(order) {
+function adaptOrderForLegacy(raw) {
   return {
-    ...order,
+    id: raw.id,
+    status: raw.status || "wait",
+    createdAt: raw.createdAt,
 
-    // 🔑 สิ่งที่ระบบเก่าต้องใช้
-    price: order.total || order.price || 0,
+    // === ใหม่ ===
+    wash: raw.wash || null,
+    dry: raw.dry || null,
+    foldPrice: raw.foldPrice || 0,
+    delivery: raw.delivery || 0,
+    total: raw.total || raw.price || 0,
 
-    lat: order.lat || order.location?.lat,
-    lng: order.lng || order.location?.lng,
-
-    // กันพัง
-    status: order.status || "wait",
-    paymentMethod: order.paymentMethod || "cash",
-    paymentStatus: order.paymentStatus || "pay_on_delivery"
+    // === fallback ของเก่า ===
+    price: raw.price || raw.total || 0,
   };
 }
