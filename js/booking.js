@@ -3,10 +3,10 @@
  const weight = document.getElementById("weight");
 const timeSlot = document.getElementById("timeSlot");
 const washTemp = document.getElementById("washTemp");
-const dryMinuteEl  = document.getElementById("dry.ExtraMinute");
+const dryExtraMinuteEl  = document.getElementById("dryExtraMinute");
 const folding = document.getElementById("folding");
 const useDry = document.getElementById("useDry");
-const washMinuteEl = document.getElementById("wash.ExtraMinute");
+const washExtraMinuteEl = document.getElementById("washExtraMinute");
 
 let APP_CONFIG = {
   serviceRadius: 750,
@@ -65,12 +65,12 @@ function updatePrice() {
  priceEl.innerText = `  
 🧺 ซัก ${result.wash.price} บาท
 - เครื่อง: ${result.wash.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.wash.ExtraMinute} นาที
+- เพิ่มเวลา: ${result.wash.extraMinute} นาที
 
 ${result.dry ? `
 🔥 อบ ${result.dry.price} บาท
 - เครื่อง: ${result.dry.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.dry.ExtraMinute} นาที
+- เพิ่มเวลา: ${result.dry.extraMinute} นาที
 ` : "🔥 ไม่อบ"}
 
 📦 พับ ${result.foldPrice} บาท
@@ -229,8 +229,8 @@ const priceResult = calculateTotalPrice({
   distance: currentDistance,
   timeSlot,
   temp: washTemp.value,
-  washMinute: Number(wash.ExtraMinuteMinuteEl.value),
-  dryMinute: Number(dry.ExtraMinuteEl.value),
+  washExtraMinute: Number(washExtraMinuteEl?.value || 0),
+  dryExtraMinute: Number(dryExtraMinuteEl?.value || 0),
   folding: folding.checked,
   useDry: useDry.checked
 });
@@ -341,32 +341,20 @@ function selectPayment(type) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const useDryEl = document.getElementById("useDry");
-  const dryMinuteEl = document.getElementById("dryExtraMinute");
+  const dryExtraMinuteEl = document.getElementById("dryExtraMinute");
 
-  if (!useDryEl || !dryMinuteEl) return;
+  if (!useDryEl || !dryExtraMinuteEl) return;
 
   useDryEl.addEventListener("change", () => {
     if (useDryEl.checked) {
-      dryMinuteEl.disabled = false;
+      dryExtraMinuteEl.disabled = false;
     } else {
-      dryMinuteEl.disabled = true;
-      dryMinuteEl.value = 0;
+      dryExtraMinuteEl.disabled = true;
+      dryExtraMinuteEl.value = 0;
     }
 
     updatePrice(); // 🔥 สำคัญมาก
   });
 });
 
-const washExtraMinute =
-  Number(document.getElementById("washExtraMinute")?.value || 0);
 
-const dryExtraMinute =
-  Number(document.getElementById("dryExtraMinute")?.value || 0);
-
-
-orderData.wash = {
-  temp: washTemp.value,
-  extraMinute: washExtra,
-  machines,
-  price: washPrice
-};
