@@ -94,7 +94,7 @@ h2, h3 {
 <input id="washHot" type="number">
 
 <label>เพิ่มเวลา (บาท/รอบ)</label>
-<input id="washExtraMinute" type="number">
+<input id="wash.ExtraMinute" type="number">
 
 <hr>
 
@@ -371,7 +371,7 @@ async function loadLaundryPricing() {
   washWarm.value = p.wash.warm;
   washHot.value = p.wash.hot;
 
-  washExtraMinute.value = p.washExtraMinutePrice;
+  wash.ExtraMinute.value = p.wash.ExtraMinutePrice;
 
   dryBase.value = p.dry.base;
   dryPer10.value = p.dry.per10min;
@@ -386,7 +386,7 @@ async function saveLaundryPricing() {
       warm: Number(washWarm.value),
       hot: Number(washHot.value)
     },
-    washExtraMinutePrice: Number(washExtraMinute.value),
+    washExtraMinutePrice: Number(wash.ExtraMinute.value),
     dry: {
       base: Number(dryBase.value),
       per10min: Number(dryPer10.value)
@@ -404,7 +404,7 @@ function renderOrderDetail(order) {
     html += `
 🧺 ซักผ้า
 - เครื่อง: ${order.wash.machines.join(" + ")} kg
-- เพิ่มเวลา: ${order.wash.extraMinute || 0} นาที
+- เพิ่มเวลา: ${order.wash?.ExtraMinute ?? 0} นาที
 - ราคา: ${order.wash.price} บาท
 `;
   }
@@ -413,7 +413,7 @@ function renderOrderDetail(order) {
     html += `
 🔥 อบผ้า
 - เครื่อง: ${order.dry.machines.join(" + ")} kg
-- เพิ่มเวลา: ${order.dry.extraMinute || 0} นาที
+- เพิ่มเวลา: ${order.dry.ExtraMinute || 0} นาที
 - ราคา: ${order.dry.price} บาท
 `;
   }

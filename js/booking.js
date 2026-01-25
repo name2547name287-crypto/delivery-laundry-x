@@ -3,10 +3,10 @@
  const weight = document.getElementById("weight");
 const timeSlot = document.getElementById("timeSlot");
 const washTemp = document.getElementById("washTemp");
-const dryMinuteEl  = document.getElementById("dryMinute");
+const dryMinuteEl  = document.getElementById("dry.ExtraMinute");
 const folding = document.getElementById("folding");
 const useDry = document.getElementById("useDry");
-const washMinuteEl = document.getElementById("washMinute");
+const washMinuteEl = document.getElementById("wash.ExtraMinute");
 
 let APP_CONFIG = {
   serviceRadius: 750,
@@ -51,14 +51,14 @@ const result = calculateTotalPrice({
   distance: currentDistance,
   timeSlot: timeSlot.value,
   temp: washTemp.value,
- washMinute: Number(washMinuteEl.value),
-  dryMinute: Number(dryMinuteEl.value),
+  washMinute: Number(wash.ExtraMinuteEl.value),
+  dryMinute: Number(dry.ExtraMinuteEl.value),
   folding: folding.checked,
   useDry: useDry.checked
 });
 
-if (useDry.checked && Number(dryMinute.value) < 0) {
-  dryMinute.value = 0;
+if (useDry.checked && Number(dry.ExtraMinuteEl.value) < 0) {
+  dry.ExtraMinuteEl.value = 0;
 }
 
 
@@ -67,15 +67,15 @@ if (useDry.checked && Number(dryMinute.value) < 0) {
     return;
   }
 
- priceEl.innerText = `
+ priceEl.innerText = `  
 🧺 ซัก ${result.wash.price} บาท
 - เครื่อง: ${result.wash.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.wash.extraMinute} นาที
+- เพิ่มเวลา: ${result.wash.ExtraMinute} นาที
 
 ${result.dry ? `
 🔥 อบ ${result.dry.price} บาท
 - เครื่อง: ${result.dry.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.dry.extraMinute} นาที
+- เพิ่มเวลา: ${result.dry.ExtraMinute} นาที
 ` : "🔥 ไม่อบ"}
 
 📦 พับ ${result.foldPrice} บาท
@@ -234,8 +234,8 @@ const priceResult = calculateTotalPrice({
   distance: currentDistance,
   timeSlot,
   temp: washTemp.value,
-  washMinute: Number(washMinuteEl.value),
-  dryMinute: Number(dryMinuteEl.value),
+  washMinute: Number(wash.ExtraMinuteMinuteEl.value),
+  dryMinute: Number(dry.ExtraMinuteEl.value),
   folding: folding.checked,
   useDry: useDry.checked
 });
@@ -333,20 +333,20 @@ function selectPayment(type) {
   "weight",
   "timeSlot",
   "washTemp",
-  "washMinute",
-  "dryMinute",
+  "wash.ExtraMinute",
+  "dry.ExtraMinute",
   "folding"
 ].forEach(id => {
  document.getElementById(id)?.addEventListener("change", updatePrice);
 });
-["dryMinute", "washMinute"].forEach(id => {
+["dry.ExtraMinute", "wash.ExtraMinute"].forEach(id => {
   document.getElementById(id)?.addEventListener("input", updatePrice);
 });
 
 
 document.addEventListener("DOMContentLoaded", () => {
   const useDryEl = document.getElementById("useDry");
-  const dryMinuteEl = document.getElementById("dryMinute");
+  const dryMinuteEl = document.getElementById("dry.ExtraMinute");
 
   if (!useDryEl || !dryMinuteEl) return;
 
@@ -362,3 +362,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+const washExtra = Number(document.getElementById("washMinute").value || 0);
+
+orderData.wash = {
+  temp: washTemp.value,
+  extraMinute: washExtra,
+  machines,
+  price: washPrice
+};

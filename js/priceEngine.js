@@ -146,6 +146,8 @@ function calculateTotalPrice(input) {
   };
 }
 
+const washExtraMinute = Number(washMinute.value || 0);
+const washExtraPrice = (washExtraMinute / 10) * pricing.washExtraMinutePrice;
 
 
 
