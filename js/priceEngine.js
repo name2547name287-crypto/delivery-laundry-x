@@ -60,9 +60,16 @@ function calculateBestWash(weight, temp, extraMinute) {
 
   if (best.price === Infinity) return null;
 
-  best.price += Math.ceil(extraMinute / 10) * EXTRA_WASH_PER_10;
-  return best;
+  const extraPrice =
+    Math.ceil(extraMinute / 10) * EXTRA_WASH_PER_10;
+
+  return {
+    price: best.price + extraPrice,
+    machines: best.machines,
+    extraMinute   // ✅ ใส่บรรทัดนี้
+  };
 }
+
 
 
 
