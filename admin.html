@@ -163,6 +163,36 @@ auth.onAuthStateChanged(async user => {
 
 });
 
+function renderLaundryDetail(order) {
+  let html = "";
+
+  if (order.wash) {
+    html += `
+🧺 ซักผ้า
+- เครื่อง: ${order.wash.machines.join(" + ")} kg
+- เพิ่มเวลา: ${order.wash.extraMinute || 0} นาที
+- ราคา: ${order.wash.price} บาท
+<br>`;
+  }
+
+  if (order.dry) {
+    html += `
+🔥 อบผ้า
+- เครื่อง: ${order.dry.machines.join(" + ")} kg
+- เพิ่มเวลา: ${order.dry.extraMinute || 0} นาที
+- ราคา: ${order.dry.price} บาท
+<br>`;
+  }
+
+  html += `
+📦 พับผ้า: ${order.foldPrice} บาท<br>
+🚚 ค่าส่ง: ${order.delivery} บาท<br>
+💰 รวม: ${order.total} บาท
+`;
+
+  return html;
+}
+
 
 // 🔁 เปลี่ยนสถานะออเดอร์
 function updateStatus(orderId, status) {
@@ -233,6 +263,11 @@ function renderOrderCard(order) {
       </div>
 
       <div class="sub">📌 สถานะ: ${order.status}</div>
+
+      <div class="sub" style="white-space:pre-line; margin-top:8px">
+${renderLaundryDetail(order)}
+</div>
+
 
       ${
         mapLink
