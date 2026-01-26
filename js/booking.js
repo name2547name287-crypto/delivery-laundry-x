@@ -341,7 +341,6 @@ function selectPayment(type) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const useDryEl = document.getElementById("useDry");
-  const dryExtraMinuteEl = document.getElementById("dryExtraMinute");
 
   if (!useDryEl || !dryExtraMinuteEl) return;
 
