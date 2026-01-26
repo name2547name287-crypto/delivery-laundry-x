@@ -404,7 +404,7 @@ function renderOrderDetail(order) {
     html += `
 🧺 ซักผ้า
 - เครื่อง: ${order.wash.machines.join(" + ")} kg
-- เพิ่มเวลา: ${order.wash.extraMinute || 0} นาที
+- เพิ่มเวลา: ${order.wash.ExtraMinute || 0} นาที
 - ราคา: ${order.wash.price} บาท
 `;
   }

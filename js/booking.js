@@ -65,12 +65,12 @@ function updatePrice() {
  priceEl.innerText = `  
 🧺 ซัก ${result.wash.price} บาท
 - เครื่อง: ${result.wash.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.wash.extraMinute} นาที
+- เพิ่มเวลา: ${result.wash.ExtraMinute} นาที
 
 ${result.dry ? `
 🔥 อบ ${result.dry.price} บาท
 - เครื่อง: ${result.dry.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.dry.extraMinute} นาที
+- เพิ่มเวลา: ${result.dry.ExtraMinute} นาที
 ` : "🔥 ไม่อบ"}
 
 📦 พับ ${result.foldPrice} บาท
