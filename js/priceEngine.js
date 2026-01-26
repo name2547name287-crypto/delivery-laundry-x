@@ -36,7 +36,7 @@ function calculateDelivery(weight, distance, timeSlot) {
 }
 
 // ================= BEST WASH =================
-function calculateBestWash(weight, temp, washExtraMinute) {
+function calculateBestWash(weight, temp, extraMinute) {
   let best = { price: Infinity, machines: [] };
 
   function dfs(currentKg, price, machines) {
@@ -67,7 +67,7 @@ function calculateBestWash(weight, temp, washExtraMinute) {
 
 
 // ================= BEST DRY =================
-function calculateBestDry(weight, dryExtraMinute) {
+function calculateBestDry(weight, extraMinute) {
   let best = { price: Infinity, machines: [] };
 
   function dfs(currentKg, price, machines) {
