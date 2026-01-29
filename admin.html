@@ -73,6 +73,31 @@ h2, h3 {
   color: #fff;
 }
 
+.card {
+  background: #151515;
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+
+.card h3 {
+  margin-top: 0;
+  color: #22c55e;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 12px;
+  border-radius: 10px;
+  border: none;
+  background: #0f0f0f;
+  color: #fff;
+  font-size: 15px;
+}
+
+
 </style>
 </head>
 
@@ -256,10 +281,6 @@ function renderOrderCard(order) {
 
       <div class="sub">
         📅 ${order.bookingDate || "-"} | ⏰ ${order.timeSlot || "-"}
-      </div>
-
-      <div class="sub">
-        🧺 ${order.weight || 0} kg | 💰 ${order.price || 0} บาท
       </div>
 
       <div class="sub">📌 สถานะ: ${order.status}</div>

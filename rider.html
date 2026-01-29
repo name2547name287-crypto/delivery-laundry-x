@@ -176,11 +176,11 @@ function renderOrderCard(order) {
         📅 ${order.bookingDate || "-"} | ⏰ ${order.timeSlot || "-"}
       </div>
 
-      <div class="sub">
-        🧺 ${order.weight || 0} kg | 💰 ${order.price || 0} บาท
-      </div>
-
       <div class="sub">📌 สถานะ: ${order.status}</div>
+           
+      <div class="sub" style="white-space:pre-line; margin-top:8px">
+${renderLaundryDetail(order)}</div>
+
 <div class="order-pay">💳 ${payText(order.paymentStatus)}</div>
       ${
         mapLink
@@ -194,9 +194,6 @@ function renderOrderCard(order) {
         <button class="btn-send" onclick="updateStatus('${order.id}','delivering')">📦 ส่ง</button>
         <button class="btn-done" onclick="updateStatus('${order.id}','done')">✅ เสร็จ</button>
       </div>
-      <div class="sub" style="white-space:pre-line; margin-top:8px">
-${renderLaundryDetail(order)}
-</div>
     </div>
   `;
 }
