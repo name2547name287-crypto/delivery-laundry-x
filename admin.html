@@ -406,7 +406,7 @@ async function loadLaundryPricing() {
   washWarm.value = p.wash.warm;
   washHot.value = p.wash.hot;
 
-  wash.ExtraMinute.value = p.wash.ExtraMinutePrice;
+  washExtraMinute.value = p.washExtraMinutePrice;
 
   dryBase.value = p.dry.base;
   dryPer10.value = p.dry.per10min;
@@ -421,7 +421,7 @@ async function saveLaundryPricing() {
       warm: Number(washWarm.value),
       hot: Number(washHot.value)
     },
-    washExtraMinutePrice: Number(wash.ExtraMinute.value),
+    washExtraMinutePrice: Number(washExtraMinute.value),
     dry: {
       base: Number(dryBase.value),
       per10min: Number(dryPer10.value)
@@ -461,9 +461,6 @@ function renderOrderDetail(order) {
 
   return html;
 }
-
-const detail = renderOrderDetail(order);
-detailBox.innerText = detail;
 
 
 loadActiveOrders();
