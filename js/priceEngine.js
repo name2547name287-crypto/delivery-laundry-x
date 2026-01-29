@@ -153,6 +153,9 @@ function calculateTotalPrice(input) {
   };
 }
 
+
+
+
 const washExtraPrice = (washExtraMinute / 10) * 10; // 10฿ ต่อ 10 นาที
 
 const dryExtraPrice = (dryExtraMinute / 10) * 10;

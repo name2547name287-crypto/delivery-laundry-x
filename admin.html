@@ -476,7 +476,7 @@ function renderOrderDetail(order) {
 
   html += `
 📦 พับผ้า: ${order.foldPrice} บาท
-🚚 ค่าส่ง: ${order.delivery} บาท
+🚚 ค่าส่ง: ${order.delivery?.fee || 0} บาท
 💰 รวมทั้งหมด: ${order.total} บาท
 `;
 

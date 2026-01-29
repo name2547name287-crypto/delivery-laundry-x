@@ -44,3 +44,13 @@ function adaptOrderForLegacy(raw) {
 
   return order;
 }
+
+export function adaptOrderForLegacy(raw) {
+  return {
+    ...raw,
+    delivery: raw.delivery?.fee 
+      ?? raw.deliveryFee 
+      ?? raw.shipping 
+      ?? 0,
+  };
+}
