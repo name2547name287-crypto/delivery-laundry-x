@@ -114,7 +114,7 @@ function renderLaundryDetail(order) {
 
   html += `
 📦 พับผ้า: ${order.foldPrice} บาท<br>
-🚚 ค่าส่ง: ${order.delivery} บาท<br>
+🚚 ค่าส่ง: ${order.delivery?.fee || 0} บาท
 💰 รวม: ${order.total} บาท
 `;
 
