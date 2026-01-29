@@ -76,13 +76,17 @@ auth.onAuthStateChanged(async user => {
     location.href = "login.html";
     return;
   }
+ 
+  else {
+    const snap = await db.collection("users").doc(user.uid).get();
+ const role = snap.data().role;
+if (role !== "rider" && role !== "admin") {
+  alert("ไม่มีสิทธิ์เข้า");
+  location.href = "index.html";
+  return;
+}
+ 
 
-  const snap = await db.collection("users").doc(user.uid).get();
-  if (!snap.exists || snap.data().role !== "rider") 
-   if (!snap.exists || snap.data().role !== "admin"){
-    alert("ไม่ใช่ Rider");
-    location.href = "index.html";
-    return;
   }
 
 });
@@ -190,6 +194,9 @@ function renderOrderCard(order) {
         <button class="btn-send" onclick="updateStatus('${order.id}','delivering')">📦 ส่ง</button>
         <button class="btn-done" onclick="updateStatus('${order.id}','done')">✅ เสร็จ</button>
       </div>
+      <div class="sub" style="white-space:pre-line; margin-top:8px">
+${renderLaundryDetail(order)}
+</div>
     </div>
   `;
 }
