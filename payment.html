@@ -60,6 +60,17 @@ async function markPaid() {
   location.href = "order.html";
 }
 
+async function loadPaymentConfig() {
+  const snap = await db.collection("config").doc("payment").get();
+  if (!snap.exists) return;
+
+  const p = snap.data();
+  document.getElementById("bankName").innerText = p.bankName;
+  document.getElementById("bankAccount").innerText = p.bankAccount;
+  document.getElementById("accountName").innerText = p.accountName;
+}
+
+loadPaymentConfig();
 loadPayment();
 </script>
 

@@ -1,23 +1,12 @@
 // ================= MACHINE CONFIG =================
 // js/priceEngine.js
 
-const WASH_MACHINES = [
-  { kg: 10, cold: 40, warm: 50, hot: 60 },
-  { kg: 14, cold: 60, warm: 70, hot: 80 },
-  { kg: 18, cold: 70, warm: 80, hot: 90 },
-  { kg: 28, cold: 100, warm: 120, hot: 140 }
-];
+let PRICING = null;
 
-const EXTRA_WASH_PER_10 = 10;
+function setPricingFromFirestore(data) {
+  PRICING = data;
+}
 
-const DRY_MACHINES = [
-  { kg: 15, price: 50 },
-  { kg: 20, price: 60 },
-  { kg: 25, price: 70 }
-];
-
-const EXTRA_DRY_PER_10 = 10;
-const FOLD_PER_KG = 1.5;
 
 
 // ================= DELIVERY =================
@@ -110,48 +99,37 @@ function calculateBestDry(weight, extraMinute) {
 
 
 // ================= TOTAL =================
-function calculateTotalPrice(input) {
-  const {
-    weight,
-    distance,
-    timeSlot,
-    temp,
-    washExtraMinute,
-    dryExtraMinute,
-    folding,
-    useDry
-  } = input;
+function calculateTotalPrice({ weight, temp, washExtraMinute, useDry, dryExtraMinute, folding, distance, timeSlot }) {
+  if (!PRICING) return null;
 
-  // 🚚 DELIVERY
-  const delivery = calculateDelivery(weight, distance, timeSlot);
-  if (delivery === null) return null;
+  const washPricePerKg = PRICING.wash.temperatures[temp].price;
+  const washPrice = weight * washPricePerKg;
 
-  // 🧺 WASH
-  const wash = calculateBestWash(weight, temp, washExtraMinute);
+  const washExtra = washExtraMinute * PRICING.wash.extraMinutePrice;
 
-  // 🔥 DRY
   let dry = null;
   if (useDry) {
-    dry = calculateBestDry(weight, dryExtraMinute);
+    dry = {
+      price:
+        PRICING.dry.basePrice +
+        Math.ceil(dryExtraMinute / 10) * PRICING.dry.per10Minute,
+      extraMinute: dryExtraMinute
+    };
   }
 
-  // 📦 FOLD
-  const foldPrice = folding ? weight * FOLD_PER_KG : 0;
-
-  const total =
-    delivery +
-    wash.price +
-    (dry ? dry.price : 0) +
-    foldPrice;
+  const foldPrice = folding ? weight * PRICING.fold.perKg : 0;
 
   return {
-    delivery,
-    wash,
+    wash: {
+      price: washPrice + washExtra,
+      extraMinute: washExtraMinute
+    },
     dry,
     foldPrice,
-    total
+    total: washPrice + washExtra + (dry?.price || 0) + foldPrice
   };
 }
+
 
 
 

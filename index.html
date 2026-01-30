@@ -525,6 +525,21 @@ auth.onAuthStateChanged(async user => {
   }
 });
 
+function renderTempOptions(pricing) {
+  const select = document.getElementById("washTemp");
+  select.innerHTML = "";
+
+  Object.entries(pricing.wash.temperatures).forEach(([key, t]) => {
+    if (!t.enabled) return;
+
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = key.toUpperCase();
+    select.appendChild(opt);
+  });
+}
+renderTempOptions(PRICING);
+
 
 
 

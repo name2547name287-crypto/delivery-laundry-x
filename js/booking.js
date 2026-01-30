@@ -355,4 +355,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+async function loadPricing() {
+  const snap = await db.collection("pricing").doc("laundry").get();
+  if (!snap.exists) return alert("ไม่พบ pricing");
+
+  setPricingFromFirestore(snap.data());
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadPricing();
+  updatePrice();
+});
 
