@@ -204,7 +204,6 @@ function renderLaundryDetail(order) {
   if (order.wash) {
     html += `
 🧺 ซักผ้า
-- เครื่อง: ${order.wash.machines.join(" + ")} kg
 - เพิ่มเวลา: ${order.wash.extraMinute || 0} นาที
 - ราคา: ${order.wash.price} บาท
 <br>`;
@@ -213,21 +212,19 @@ function renderLaundryDetail(order) {
   if (order.dry) {
     html += `
 🔥 อบผ้า
-- เครื่อง: ${order.dry.machines.join(" + ")} kg
 - เพิ่มเวลา: ${order.dry.extraMinute || 0} นาที
 - ราคา: ${order.dry.price} บาท
 <br>`;
   }
 
   html += `
-📦 พับผ้า: ${order.foldPrice} บาท<br>
-🚚 ค่าส่ง: ${order.delivery?.fee || 0} บาท
+📦 พับผ้า: ${order.foldPrice || 0} บาท<br>
+🚚 ค่าส่ง: ${order.delivery || 0} บาท<br>
 💰 รวม: ${order.total} บาท
 `;
 
   return html;
 }
-
 
 // 🔁 เปลี่ยนสถานะออเดอร์
 function updateStatus(orderId, status) {
@@ -460,15 +457,15 @@ async function saveLaundryPricing() {
       temperatures: {
         cold: {
           price: Number(washCold.value),
-          enabled: true
+          enabled: enableCold.checked
         },
         warm: {
           price: Number(washWarm.value),
-          enabled: true
+          enabled: enableWarm.checked
         },
         hot: {
           price: Number(washHot.value),
-          enabled: true
+          enabled: enableHot.checked
         }
       },
       extraMinutePrice: Number(washExtraMinute.value)
@@ -484,6 +481,7 @@ async function saveLaundryPricing() {
 
   alert("✅ บันทึกราคาเรียบร้อย");
 }
+
 
 
 function renderOrderDetail(order) {
@@ -530,6 +528,10 @@ loadDeliveryConfig();
 loadActiveOrders();
 loadHistoryOrders();
 loadLaundryPricing();
+
+enableCold.checked = p.wash.temperatures.cold.enabled;
+enableWarm.checked = p.wash.temperatures.warm.enabled;
+enableHot.checked  = p.wash.temperatures.hot.enabled;
 
 
 

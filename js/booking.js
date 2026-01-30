@@ -17,7 +17,7 @@ let APP_CONFIG = {
 let SERVICE_RADIUS = 750;
 
 async function loadConfig() {
-  const snap = await db.collection("config").doc("app").get();
+  const snap = await db.collection("config").doc("delivery").get();
   if (snap.exists) {
     APP_CONFIG = snap.data();
     SERVICE_RADIUS = APP_CONFIG.serviceRadius || 750;

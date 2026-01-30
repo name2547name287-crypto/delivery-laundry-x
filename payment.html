@@ -23,7 +23,7 @@ const orderId = new URLSearchParams(location.search).get("id");
 
 async function loadPayment() {
   const orderSnap = await db.collection("orders").doc(orderId).get();
-  const cfgSnap = await db.collection("config").doc("app").get();
+  const cfgSnap = await db.collection("config").doc("payment").get();
 
   const o = orderSnap.data();
   const cfg = cfgSnap.data();
