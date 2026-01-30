@@ -525,20 +525,46 @@ auth.onAuthStateChanged(async user => {
   }
 });
 
-function renderTempOptions(pricing) {
-  const select = document.getElementById("washTemp");
-  select.innerHTML = "";
 
-  Object.entries(pricing.wash.temperatures).forEach(([key, t]) => {
+let PRICING = null;
+
+async function loadLaundryPricing() {
+  const snap = await db.collection("pricing").doc("laundry").get();
+  if (!snap.exists) {
+    console.error("❌ ไม่พบ pricing/laundry");
+    return;
+  }
+  PRICING = snap.data();
+  console.log("✅ PRICING", PRICING);
+}
+
+
+
+function renderTempOptions() {
+  if (!PRICING || !PRICING.wash) return;
+
+  const temps = PRICING.wash.temperatures;
+  const box = document.getElementById("washTempOptions");
+  box.innerHTML = "";
+
+  Object.keys(temps).forEach(key => {
+    const t = temps[key];
     if (!t.enabled) return;
 
-    const opt = document.createElement("option");
-    opt.value = key;
-    opt.textContent = key.toUpperCase();
-    select.appendChild(opt);
+    box.innerHTML += `
+      <label>
+        <input type="radio" name="washTemp" value="${key}">
+        ${key.toUpperCase()} (+${t.price} บาท)
+      </label>
+    `;
   });
 }
-renderTempOptions(PRICING);
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadLaundryPricing();
+  renderTempOptions();
+});
+
 
 
 

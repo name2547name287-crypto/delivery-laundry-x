@@ -99,44 +99,78 @@ function calculateBestDry(weight, extraMinute) {
 
 
 // ================= TOTAL =================
-function calculateTotalPrice({ weight, temp, washExtraMinute, useDry, dryExtraMinute, folding, distance, timeSlot }) {
-  if (!PRICING) return null;
+function calculateTotalPrice({
+  weight,
+  temp,
+  washExtraMinute,
+  useDry,
+  dryExtraMinute,
+  folding,
+  distance,
+  timeSlot
+}) {
+  if (!PRICING || !APP_CONFIG) return null;
 
-  const washPricePerKg = PRICING.wash.temperatures[temp].price;
-  const washPrice = weight * washPricePerKg;
+  // ===== 🧺 ซัก =====
+  const tempConfig = PRICING.wash.temperatures[temp];
+  if (!tempConfig || !tempConfig.enabled) return null;
 
-  const washExtra = washExtraMinute * PRICING.wash.extraMinutePrice;
+  const washBase = weight * tempConfig.price;
+  const washExtra =
+    Math.ceil(washExtraMinute / 10) * PRICING.wash.extraMinutePrice;
 
+  const wash = {
+    price: washBase + washExtra,
+    extraMinute: washExtraMinute
+  };
+
+  // ===== 🔥 อบ =====
   let dry = null;
   if (useDry) {
+    const dryExtra =
+      Math.ceil(dryExtraMinute / 10) * PRICING.dry.per10Minute;
+
     dry = {
-      price:
-        PRICING.dry.basePrice +
-        Math.ceil(dryExtraMinute / 10) * PRICING.dry.per10Minute,
+      price: PRICING.dry.basePrice + dryExtra,
       extraMinute: dryExtraMinute
     };
   }
 
-  const foldPrice = folding ? weight * PRICING.fold.perKg : 0;
+  // ===== 📦 พับ =====
+  const foldPrice = folding
+    ? weight * PRICING.fold.perKg
+    : 0;
+
+  // ===== 🚚 ค่าส่ง =====
+  let delivery = 0;
+
+  if (distance > APP_CONFIG.serviceRadius) return null;
+
+  delivery = weight * (APP_CONFIG.pricePerKg || 2);
+
+  if (NIGHT_SLOTS.includes(timeSlot)) {
+    delivery += APP_CONFIG.nightFee || 0;
+  }
+
+  // ===== 💰 รวม =====
+  const total =
+    wash.price +
+    (dry?.price || 0) +
+    foldPrice +
+    delivery;
 
   return {
-    wash: {
-      price: washPrice + washExtra,
-      extraMinute: washExtraMinute
-    },
+    wash,
     dry,
     foldPrice,
-    total: washPrice + washExtra + (dry?.price || 0) + foldPrice
+    delivery,
+    total
   };
 }
 
 
 
 
-
-const washExtraPrice = (washExtraMinute / 10) * 10; // 10฿ ต่อ 10 นาที
-
-const dryExtraPrice = (dryExtraMinute / 10) * 10;
 
 
 

@@ -51,8 +51,8 @@ function updatePrice() {
     distance: currentDistance,
     timeSlot: timeSlot.value,
     temp: washTemp.value,
-    washExtraMinute: Number(washExtraMinuteEl?.value || 0),
-    dryExtraMinute: Number(dryExtraMinuteEl?.value || 0),
+    washExtraMinute: Number(washExtraMinuteEl.value || 0),
+    dryExtraMinute: Number(dryExtraMinuteEl.value || 0),
     folding: folding.checked,
     useDry: useDry.checked
   });
@@ -62,23 +62,21 @@ function updatePrice() {
     return;
   }
 
- priceEl.innerText = `  
+  priceEl.innerText = `
 🧺 ซัก ${result.wash.price} บาท
-- เครื่อง: ${result.wash.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.wash.extraMinute} นาที
-  ${result.dry ? `
+- เพิ่มเวลา ${result.wash.extraMinute} นาที
+
+${result.dry ? `
 🔥 อบ ${result.dry.price} บาท
-- เครื่อง: ${result.dry.machines.join(" + ")} kg
-- เพิ่มเวลา: ${result.dry.extraMinute} นาที
+- เพิ่มเวลา ${result.dry.extraMinute} นาที
 ` : "🔥 ไม่อบ"}
 
 📦 พับ ${result.foldPrice} บาท
 🚚 ค่าส่ง ${result.delivery} บาท
 💰 รวม ${result.total} บาท
 `;
-
-
 }
+
 
 
 
