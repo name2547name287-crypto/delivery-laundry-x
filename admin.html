@@ -229,13 +229,16 @@ function updateStatus(orderId, status) {
 }
 
 async function saveConfig() {
-  await db.collection("config").doc("app").set({
-    serviceRadius: Number(cfgRadius.value),
+  await db.collection("config").doc("delivery").set({
+    baseRadius: Number(cfgRadius.value),
     pricePerKg: Number(cfgPrice.value),
-    nightFee: Number(cfgNight.value)
-  });
-  alert("บันทึกแล้ว");
+    nightFee: Number(cfgNight.value),
+    enabled: true
+  }, { merge: true });
+
+  alert("✅ บันทึกค่าจัดส่งแล้ว");
 }
+
 // โหลดค่าตั้งต้น
 
 function confirmPayment(orderId) {
@@ -417,41 +420,61 @@ function setStatus(orderId, newStatus) {
       status: newStatus
     });
 }
+
 async function loadLaundryPricing() {
   const snap = await db.collection("pricing").doc("laundry").get();
   if (!snap.exists) return;
 
   const p = snap.data();
 
-  washCold.value = p.wash.cold;
-  washWarm.value = p.wash.warm;
-  washHot.value = p.wash.hot;
+  // 🌡 อุณหภูมิน้ำ
+  washCold.value = p.wash.temperatures.cold.price;
+  washWarm.value = p.wash.temperatures.warm.price;
+  washHot.value  = p.wash.temperatures.hot.price;
 
-  washExtraMinute.value = p.washExtraMinutePrice;
+  // ⏱ เพิ่มเวลา
+  washExtraMinute.value = p.wash.extraMinutePrice;
 
-  dryBase.value = p.dry.base;
-  dryPer10.value = p.dry.per10min;
+  // 🔥 อบ
+  dryBase.value = p.dry.basePrice;
+  dryPer10.value = p.dry.per10Minute;
 
-  foldPerKg.value = p.foldPerKg;
+  // 📦 พับ
+  foldPerKg.value = p.fold.perKg;
+  
 }
 
 async function saveLaundryPricing() {
-  await db.collection("pricing").doc("laundry").update({
+  await db.collection("pricing").doc("laundry").set({
     wash: {
-      cold: Number(washCold.value),
-      warm: Number(washWarm.value),
-      hot: Number(washHot.value)
+      temperatures: {
+        cold: {
+          price: Number(washCold.value),
+          enabled: true
+        },
+        warm: {
+          price: Number(washWarm.value),
+          enabled: true
+        },
+        hot: {
+          price: Number(washHot.value),
+          enabled: true
+        }
+      },
+      extraMinutePrice: Number(washExtraMinute.value)
     },
-    washExtraMinutePrice: Number(washExtraMinute.value),
     dry: {
-      base: Number(dryBase.value),
-      per10min: Number(dryPer10.value)
+      basePrice: Number(dryBase.value),
+      per10Minute: Number(dryPer10.value)
     },
-    foldPerKg: Number(foldPerKg.value)
-  });
+    fold: {
+      perKg: Number(foldPerKg.value)
+    }
+  }, { merge: true });
 
-  alert("✅ บันทึกราคาซักแล้ว");
+  alert("✅ บันทึกราคาเรียบร้อย");
 }
+
 
 function renderOrderDetail(order) {
   let html = "";
@@ -483,15 +506,27 @@ function renderOrderDetail(order) {
   return html;
 }
 
+async function loadDeliveryConfig() {
+  const snap = await db.collection("config").doc("delivery").get();
+  if (!snap.exists) return;
 
+  const c = snap.data();
+  cfgRadius.value = c.baseRadius;
+  cfgPrice.value  = c.pricePerKg;
+  cfgNight.value  = c.nightFee;
+}
+
+loadDeliveryConfig();
 loadActiveOrders();
 loadHistoryOrders();
+loadLaundryPricing();
+
 
 
 </script>
 
 
+
 </body>
 
 </html>
-
