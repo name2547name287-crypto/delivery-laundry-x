@@ -1,173 +1,97 @@
 // ================= MACHINE CONFIG =================
 // js/priceEngine.js
+import { getWashers } from "./machineService.js";
+import { chooseWashersByWeight } from "./washCalculator.js";
+import { calcTemperaturePrice } from "./tempCalculator.js";
 
-let PRICING = null;
+export async function calculateTotalPrice(input) {
+  const {
+    weight,
+    temp,
+    washExtraMinute,
+    useDry,
+    dryExtraMinute,
+    folding,
+    distance,
+    timeSlot
+  } = input;
 
-function setPricingFromFirestore(data) {
-  PRICING = data;
-}
+  // 1️⃣ โหลดเครื่องจาก Firestore
+  const washers = await getWashers();
 
+  // 2️⃣ เลือกชุดเครื่องที่ถูกที่สุด
+  const washResult = chooseWashersByWeight(weight, washers);
+  if (!washResult) return null;
 
+  // 3️⃣ โหลด pricing
+  const pricingSnap = await db.collection("pricing").doc("laundry").get();
+  if (!pricingSnap.exists) return null;
+  const pricing = pricingSnap.data();
 
-// ================= DELIVERY =================
-function calculateDelivery(weight, distance, timeSlot) {
-  let price = weight * (APP_CONFIG.pricePerKg || 2);
+  // 4️⃣ ราคาซักพื้นฐาน
+  let washPrice = washResult.price;
 
-  if (NIGHT_SLOTS.includes(timeSlot)) {
-    price += APP_CONFIG.nightFee || 10;
-  }
+  // 5️⃣ เพิ่มเวลา (คิดตามจำนวนเครื่อง)
+  const washExtraPrice =
+    (washExtraMinute / 10) * 10 * washResult.machines.length;
 
-  if (distance <= 500) price += 20;
-  else if (distance <= 750) price += 30;
-  else return null;
+  washPrice += washExtraPrice;
 
-  return price;
-}
+  // 6️⃣ ราคาอุณหภูมิ (🔥 จุดสำคัญ)
+  const tempPrice = calcTemperaturePrice(
+    temp,
+    pricing,
+    washResult.machines.length
+  );
 
-// ================= BEST WASH =================
-function calculateBestWash(weight, temp, extraMinute) {
-  let best = { price: Infinity, machines: [] };
+  washPrice += tempPrice;
 
-  function dfs(currentKg, price, machines) {
-    if (currentKg >= weight) {
-      if (price < best.price) {
-        best = { price, machines };
-      }
-      return;
-    }
-
-    for (const m of WASH_MACHINES) {
-      dfs(
-        currentKg + m.kg,
-        price + m[temp],
-        [...machines, m.kg]
-      );
-    }
-  }
-
-  dfs(0, 0, []);
-
-  if (best.price === Infinity) return null;
-
-  const extraPrice =
-    Math.ceil(extraMinute / 10) * EXTRA_WASH_PER_10;
-
-  return {
-    price: best.price + extraPrice,
-    machines: best.machines,
-    extraMinute   // ✅ ใส่บรรทัดนี้
-  };
-}
-
-
-
-
-// ================= BEST DRY =================
-function calculateBestDry(weight, extraMinute) {
-  let best = { price: Infinity, machines: [] };
-
-  function dfs(currentKg, price, machines) {
-    if (currentKg >= weight) {
-      if (price < best.price) {
-        best = { price, machines };
-      }
-      return;
-    }
-
-    for (const m of DRY_MACHINES) {
-      dfs(
-        currentKg + m.kg,
-        price + m.price,
-        [...machines, m.kg]
-      );
-    }
-  }
-
-  dfs(0, 0, []);
-
-  if (best.price === Infinity) return null;
-
-  const extra =
-    Math.ceil(extraMinute / 10) * EXTRA_DRY_PER_10;
-
-  return {
-    price: best.price + extra,
-    machines: best.machines,
-    extraMinute
-  };
-}
-
-
-// ================= TOTAL =================
-function calculateTotalPrice({
-  weight,
-  temp,
-  washExtraMinute,
-  useDry,
-  dryExtraMinute,
-  folding,
-  distance,
-  timeSlot
-}) {
-  if (!PRICING || !APP_CONFIG) return null;
-
-  // ===== 🧺 ซัก =====
-  const tempConfig = PRICING.wash.temperatures[temp];
-  if (!tempConfig || !tempConfig.enabled) return null;
-
-  const washBase = weight * tempConfig.price;
-  const washExtra =
-    Math.ceil(washExtraMinute / 10) * PRICING.wash.extraMinutePrice;
-
-  const wash = {
-    price: washBase + washExtra,
-    extraMinute: washExtraMinute
-  };
-
-  // ===== 🔥 อบ =====
+  // 7️⃣ อบ
   let dry = null;
   if (useDry) {
+    const dryBase =
+      pricing.dry.basePrice * washResult.machines.length;
     const dryExtra =
-      Math.ceil(dryExtraMinute / 10) * PRICING.dry.per10Minute;
+      (dryExtraMinute / 10) * pricing.dry.extraPer10Min
+        * washResult.machines.length;
 
     dry = {
-      price: PRICING.dry.basePrice + dryExtra,
+      price: dryBase + dryExtra,
       extraMinute: dryExtraMinute
     };
   }
 
-  // ===== 📦 พับ =====
+  // 8️⃣ พับ
   const foldPrice = folding
-    ? weight * PRICING.fold.perKg
+    ? weight * pricing.fold.pricePerKg
     : 0;
 
-  // ===== 🚚 ค่าส่ง =====
-  let delivery = 0;
+  // 9️⃣ ค่าส่ง
+  const delivery =
+    distance > pricing.delivery.baseRadius
+      ? pricing.delivery.extraFee
+      : pricing.delivery.baseFee;
 
-  if (distance > APP_CONFIG.serviceRadius) return null;
-
-  delivery = weight * (APP_CONFIG.pricePerKg || 2);
-
-  if (NIGHT_SLOTS.includes(timeSlot)) {
-    delivery += APP_CONFIG.nightFee || 0;
-  }
-
-  // ===== 💰 รวม =====
+  // 🔟 รวม
   const total =
-    wash.price +
+    washPrice +
     (dry?.price || 0) +
     foldPrice +
     delivery;
 
   return {
-    wash,
+    wash: {
+      machines: washResult.machines.map(m => m.sizeKg),
+      machineCount: washResult.machines.length,
+      price: washPrice,
+      extraMinute: washExtraMinute
+    },
     dry,
     foldPrice,
     delivery,
     total
   };
 }
-
 
 
 

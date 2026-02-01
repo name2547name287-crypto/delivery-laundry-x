@@ -45,8 +45,8 @@ const SHOP_CENTER = { lat: 16.426657691622538, lng: 102.83257797027551 };
 // ===== PRICE =====
 const priceEl = document.getElementById("price");
 
-function updatePrice() {
-  const result = calculateTotalPrice({
+async function updatePrice() {
+  const result = await calculateTotalPrice({
     weight: Number(weight.value),
     distance: currentDistance,
     timeSlot: timeSlot.value,
@@ -57,7 +57,7 @@ function updatePrice() {
     useDry: useDry.checked
   });
 
-  if (!result) {
+if (!result) {
     priceEl.innerText = "❌ คำนวณไม่ได้";
     return;
   }
@@ -76,7 +76,6 @@ ${result.dry ? `
 💰 รวม ${result.total} บาท
 `;
 }
-
 
 
 
@@ -204,21 +203,10 @@ async function submitBooking() {
   const customerNote =
     document.getElementById("customerNote")?.value || "";
 
-  const bookingDate = document.getElementById("bookingDate").value;
-  const timeSlot = document.getElementById("timeSlot").value;
-  const weight = Number(document.getElementById("weight").value);
-  const WASH_MACHINES = [
-  { kg: 10, cold: 40, warm: 50, hot: 60 },
-  { kg: 14, cold: 60, warm: 70, hot: 80 },
-  { kg: 18, cold: 70, warm: 80, hot: 90 },
-  { kg: 28, cold: 100, warm: 120, hot: 140 }
-];
-const DRY_MACHINES = [
-  { kg: 15, baseMinute: 30, price: 50 },
-  { kg: 20, baseMinute: 30, price: 60 },
-  { kg: 25, baseMinute: 30, price: 70 }
-];
-
+const bookingDate = document.getElementById("bookingDate").value;
+const timeSlot = document.getElementById("timeSlot").value;
+const weight = Number(document.getElementById("weight").value);
+ 
 
 
 const priceResult = calculateTotalPrice({
