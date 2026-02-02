@@ -47,10 +47,14 @@ async function calculateTotalPrice(input) {
   let dry = null;
   if (useDry) {
     const dryBase =
-      pricing.dry.basePrice * washResult.machines.length;
+  (pricing.dry.pricePerMachine || 0)
+  * washResult.machines.length;
     const dryExtra =
-      (dryExtraMinute / 10) * pricing.dry.extraPer10Min
-        * washResult.machines.length;
+  (dryExtraMinute / 10)
+  * (pricing.dry.extraPer10Min || 0)
+  * washResult.machines.length;
+
+
 
     dry = {
       price: dryBase + dryExtra,
@@ -58,10 +62,11 @@ async function calculateTotalPrice(input) {
     };
   }
 
-  // 8️⃣ พับ
-  const foldPrice = folding
-    ? weight * pricing.fold.pricePerKg
-    : 0;
+  // 8️⃣ พับผ้า
+const foldPrice = folding
+  ? weight * (pricing.fold.price || 0)
+  : 0;
+
 
   // 9️⃣ ค่าส่ง (ดึงจาก config/delivery)
 const configSnap = await db.collection("config").doc("delivery").get();
@@ -90,18 +95,29 @@ if (["21:00", "22:30", "00:00", "02:00"].includes(timeSlot)) {
     foldPrice +
     delivery;
 
-  return {
-    wash: {
-      machines: washResult.machines.map(m => m.sizeKg),
-      machineCount: washResult.machines.length,
-      price: washPrice,
-      extraMinute: washExtraMinute
-    },
-    dry,
-    foldPrice,
-    delivery,
-    total
-  };
+ const safe = n => Number.isFinite(n) ? n : 0;
+
+return {
+  wash: {
+    machines: washResult.machines.map(m => m.sizeKg),
+    machineCount: washResult.machines.length,
+    price: safe(washPrice),
+    extraMinute: washExtraMinute
+  },
+  dry: dry ? {
+    ...dry,
+    price: safe(dry.price)
+  } : null,
+  foldPrice: safe(foldPrice),
+  delivery: safe(delivery),
+  total: safe(
+    washPrice +
+    (dry?.price || 0) +
+    foldPrice +
+    delivery
+  )
+};
+
 }
 
 async function getWashers() {
