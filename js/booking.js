@@ -209,7 +209,7 @@ const weight = Number(document.getElementById("weight").value);
  
 
 
-const priceResult = calculateTotalPrice({
+const priceResult = await calculateTotalPrice({
   weight,
   distance: currentDistance,
   timeSlot,
@@ -341,15 +341,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-async function loadPricing() {
-  const snap = await db.collection("pricing").doc("laundry").get();
-  if (!snap.exists) return alert("ไม่พบ pricing");
+updatePrice();
 
-  setPricingFromFirestore(snap.data());
-}
 
-document.addEventListener("DOMContentLoaded", async () => {
-  await loadPricing();
-  updatePrice();
-});
+
 

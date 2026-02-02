@@ -1,10 +1,7 @@
 // ================= MACHINE CONFIG =================
 // js/priceEngine.js
-import { getWashers } from "./machineService.js";
-import { chooseWashersByWeight } from "./washCalculator.js";
-import { calcTemperaturePrice } from "./tempCalculator.js";
 
-export async function calculateTotalPrice(input) {
+async function calculateTotalPrice(input) {
   const {
     weight,
     temp,
@@ -93,6 +90,40 @@ export async function calculateTotalPrice(input) {
   };
 }
 
+async function getWashers() {
+  const snap = await db.collection("machines").get();
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    .filter(m => m.type === "washer" && m.enabled);
+}
+
+function chooseWashersByWeight(totalKg, machines) {
+  machines = machines.sort((a, b) => a.sizeKg - b.sizeKg);
+  let best = null;
+
+  function dfs(remainKg, used) {
+    if (remainKg <= 0) {
+      const price = used.reduce((s, m) => s + m.basePrice, 0);
+      if (!best || price < best.price) {
+        best = { machines: [...used], price };
+      }
+      return;
+    }
+    for (let m of machines) {
+      used.push(m);
+      dfs(remainKg - m.sizeKg, used);
+      used.pop();
+    }
+  }
+
+  dfs(totalKg, []);
+  return best;
+}
+
+function calcTemperaturePrice(tempKey, pricing, machineCount) {
+  const temp = pricing.wash.temperatures[tempKey];
+  if (!temp || !temp.enabled) return 0;
+  return temp.price * machineCount;
+}
 
 
 
