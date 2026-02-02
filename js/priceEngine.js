@@ -162,8 +162,7 @@ function calcTemperaturePrice(tempKey, pricing, machineCount) {
   return temp.price * machineCount;
 }
 
-import { getWashers, getDryers } from "./machineService.js";
-import { chooseWashersByWeight } from "./washCalculator.js";
+
 
 
 
