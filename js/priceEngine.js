@@ -76,7 +76,7 @@ if (useDry) {
 
   // 8️⃣ พับผ้า
 const foldPrice = folding
-  ? weight * (pricing.fold.price || 0)
+  ? weight * (pricing.fold.perKg || 0)
   : 0;
 
 
@@ -94,11 +94,11 @@ if (distance > deliveryCfg.serviceRadius) {
 }
 
 // ✅ อยู่ในเขต
-delivery = deliveryCfg.baseFee;
+
 
 // ➕ เกิน 500 เมตร
-if (distance > deliveryCfg.baseDistance) {
-  delivery += deliveryCfg.extraFee;
+if (distance > 500) {
+  delivery += cfg.over500Fee || 10;
 
   // 🔥 คิดตามน้ำหนัก
   delivery += weight * deliveryCfg.pricePerKg;
