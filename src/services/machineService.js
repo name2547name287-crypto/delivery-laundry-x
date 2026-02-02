@@ -1,10 +1,11 @@
 
 // src/services/machineService.js
 // js/machineService.js async function getWashers() {
-  
-async function getDryers() {
+  // js/machineService.js
+
+async function getWashers() {
   const snap = await db.collection("machines")
-    .where("type", "==", "dryer")
+    .where("type", "==", "washer")
     .where("enabled", "==", true)
     .get();
 
@@ -14,9 +15,9 @@ async function getDryers() {
   }));
 }
 
-async function getWashers() {
+async function getDryers() {
   const snap = await db.collection("machines")
-    .where("type", "==", "washer")
+    .where("type", "==", "dryer")
     .where("enabled", "==", true)
     .get();
 
