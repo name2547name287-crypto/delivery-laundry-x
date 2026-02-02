@@ -63,11 +63,25 @@ async function calculateTotalPrice(input) {
     ? weight * pricing.fold.pricePerKg
     : 0;
 
-  // 9️⃣ ค่าส่ง
-  const delivery =
-    distance > pricing.delivery.baseRadius
-      ? pricing.delivery.extraFee
-      : pricing.delivery.baseFee;
+  // 9️⃣ ค่าส่ง (ดึงจาก config/delivery)
+const configSnap = await db.collection("config").doc("delivery").get();
+if (!configSnap.exists) return null;
+
+const deliveryCfg = configSnap.data();
+
+let delivery = 0;
+
+if (distance > deliveryCfg.baseRadius) {
+  delivery =
+    (distance - deliveryCfg.baseRadius) / 1000
+    * deliveryCfg.pricePerKg;
+}
+
+// รอบดึก
+if (["21:00", "22:30", "00:00", "02:00"].includes(timeSlot)) {
+  delivery += deliveryCfg.nightFee || 0;
+}
+
 
   // 🔟 รวม
   const total =
