@@ -88,16 +88,27 @@ const deliveryCfg = configSnap.data();
 
 let delivery = 0;
 
-if (distance > deliveryCfg.baseRadius) {
-  delivery =
-    (distance - deliveryCfg.baseRadius) / 1000
-    * deliveryCfg.pricePerKg;
+// ❌ เกินเขตให้บริการ
+if (distance > deliveryCfg.serviceRadius) {
+  return null;
 }
 
-// รอบดึก
-if (["21:00", "22:30", "00:00", "02:00"].includes(timeSlot)) {
-  delivery += deliveryCfg.nightFee || 0;
+// ✅ อยู่ในเขต
+delivery = deliveryCfg.baseFee;
+
+// ➕ เกิน 500 เมตร
+if (distance > deliveryCfg.baseDistance) {
+  delivery += deliveryCfg.extraFee;
+
+  // 🔥 คิดตามน้ำหนัก
+  delivery += weight * deliveryCfg.pricePerKg;
 }
+
+// 🌙 รอบดึก
+if (["21:00", "22:30", "00:00", "02:00"].includes(timeSlot)) {
+  delivery += deliveryCfg.nightFee;
+}
+
 
 
   // 🔟 รวม
