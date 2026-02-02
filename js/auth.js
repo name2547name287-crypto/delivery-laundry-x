@@ -1,3 +1,4 @@
+// js/auth.js
 console.log("✅ auth.js loaded");
 
 // LOGIN

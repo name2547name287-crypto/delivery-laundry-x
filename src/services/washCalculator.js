@@ -1,3 +1,4 @@
+// src/services/washCalculator.js
 export function chooseWashersByWeight(totalKg, machines) {
   machines = machines
     .filter(m => m.enabled)

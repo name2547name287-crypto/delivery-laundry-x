@@ -44,23 +44,35 @@ async function calculateTotalPrice(input) {
   washPrice += tempPrice;
 
   // 7️⃣ อบ
-  let dry = null;
-  if (useDry) {
-    const dryBase =
-  (pricing.dry.pricePerMachine || 0)
-  * washResult.machines.length;
-    const dryExtra =
+ let dry = null;
+
+if (useDry) {
+  // 1️⃣ โหลดเครื่องอบ
+  const dryers = await getDryers();
+
+  // 2️⃣ เลือกชุดเครื่องอบที่ถูกที่สุด
+  const dryResult = chooseWashersByWeight(weight, dryers);
+  if (!dryResult) return null;
+
+  // 3️⃣ ราคาพื้นฐาน
+  let dryPrice = dryResult.price;
+
+  // 4️⃣ เพิ่มเวลาอบ (คิดตามจำนวนเครื่องอบจริง)
+  const dryExtraPrice =
   (dryExtraMinute / 10)
-  * (pricing.dry.extraPer10Min || 0)
-  * washResult.machines.length;
+  * (pricing.dry?.extraPer10Min || 10)
+  * dryResult.machines.length;
 
 
+  dryPrice += dryExtraPrice;
 
-    dry = {
-      price: dryBase + dryExtra,
-      extraMinute: dryExtraMinute
-    };
-  }
+  dry = {
+    machines: dryResult.machines.map(m => m.sizeKg),
+    machineCount: dryResult.machines.length,
+    price: dryPrice,
+    extraMinute: dryExtraMinute
+  };
+}
 
   // 8️⃣ พับผ้า
 const foldPrice = folding
@@ -120,11 +132,6 @@ return {
 
 }
 
-async function getWashers() {
-  const snap = await db.collection("machines").get();
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
-    .filter(m => m.type === "washer" && m.enabled);
-}
 
 function chooseWashersByWeight(totalKg, machines) {
   machines = machines.sort((a, b) => a.sizeKg - b.sizeKg);
@@ -154,6 +161,9 @@ function calcTemperaturePrice(tempKey, pricing, machineCount) {
   if (!temp || !temp.enabled) return 0;
   return temp.price * machineCount;
 }
+
+import { getWashers, getDryers } from "./machineService.js";
+import { chooseWashersByWeight } from "./washCalculator.js";
 
 
 

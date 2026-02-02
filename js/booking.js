@@ -1,3 +1,5 @@
+ // js/booking.js
+
  alert("booking.js loaded");
 
  const weight = document.getElementById("weight");
